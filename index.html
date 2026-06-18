@@ -1,0 +1,1609 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>余烬 — 科幻群像小说</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@400;600;700;900&family=Noto+Sans+SC:wght@300;400;500;700&display=swap');
+
+:root {
+  --bg-primary: #0a0a0f;
+  --bg-secondary: #12121a;
+  --bg-card: #1a1a26;
+  --bg-hover: #22222f;
+  --text-primary: #e8e6e3;
+  --text-secondary: #9a9a9a;
+  --text-muted: #666;
+  --accent: #ff4d35;
+  --accent-glow: rgba(255, 77, 53, 0.15);
+  --border: #2a2a35;
+  --yan-color: #ff4d35;
+  --shenmu-color: #4da6ff;
+  --sutang-color: #4dff88;
+  --luyu-color: #b0b8c4;
+  --jiangxue-color: #c8d8ff;
+  --peijin-color: #ffd700;
+  --sidebar-width: 320px;
+  --content-max: 760px;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Noto Serif SC', serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  line-height: 1.95;
+  overflow: hidden;
+  height: 100vh;
+}
+
+.app-container {
+  display: flex;
+  height: 100vh;
+}
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: var(--sidebar-width);
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.sidebar-header {
+  padding: 28px 24px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-header h1 {
+  font-size: 28px;
+  font-weight: 900;
+  color: var(--accent);
+  letter-spacing: 6px;
+  margin-bottom: 4px;
+}
+
+.sidebar-header .subtitle {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+.sidebar-tabs {
+  display: flex;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-tab {
+  flex: 1;
+  padding: 12px;
+  text-align: center;
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+
+.sidebar-tab:hover { color: var(--text-secondary); }
+.sidebar-tab.active {
+  color: var(--accent);
+  border-bottom-color: var(--accent);
+}
+
+.sidebar-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.sidebar-content::-webkit-scrollbar { width: 4px; }
+.sidebar-content::-webkit-scrollbar-track { background: transparent; }
+.sidebar-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+/* Chapter list */
+.chapter-list { display: block; }
+.chapter-item {
+  display: flex;
+  align-items: center;
+  padding: 12px 24px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 14px;
+  color: var(--text-secondary);
+  gap: 12px;
+}
+
+.chapter-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+.chapter-item.active { color: var(--accent); background: var(--accent-glow); }
+
+.chapter-item .ch-num {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted);
+  min-width: 20px;
+}
+
+.chapter-item.active .ch-num { color: var(--accent); }
+
+/* Character list */
+.character-list { display: none; }
+
+.char-card {
+  padding: 16px 20px;
+  cursor: pointer;
+  transition: all 0.25s;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+}
+
+.char-card:hover { background: var(--bg-hover); }
+
+.char-card-inner {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.char-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.char-avatar svg { width: 100%; height: 100%; }
+
+.char-info { flex: 1; min-width: 0; }
+
+.char-info .name {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  margin-bottom: 2px;
+}
+
+.char-info .role {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.char-info .ability-tag {
+  display: inline-block;
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-top: 4px;
+  font-weight: 500;
+}
+
+/* ===== MAIN CONTENT ===== */
+.main-content {
+  flex: 1;
+  overflow-y: auto;
+  scroll-behavior: smooth;
+}
+
+.main-content::-webkit-scrollbar { width: 6px; }
+.main-content::-webkit-scrollbar-track { background: var(--bg-primary); }
+.main-content::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+
+.reading-area {
+  max-width: var(--content-max);
+  margin: 0 auto;
+  padding: 60px 40px 120px;
+}
+
+/* Progress bar */
+.progress-bar {
+  position: fixed;
+  top: 0;
+  left: var(--sidebar-width);
+  right: 0;
+  height: 3px;
+  background: rgba(255,255,255,0.05);
+  z-index: 100;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent), #ff8c35);
+  width: 0%;
+  transition: width 0.1s;
+}
+
+/* Chapter styles */
+.chapter {
+  margin-bottom: 80px;
+  animation: fadeInUp 0.5s ease;
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.chapter-title {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--text-primary);
+  letter-spacing: 2px;
+  position: relative;
+  padding-left: 20px;
+}
+
+.chapter-title::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 60%;
+  background: var(--accent);
+  border-radius: 2px;
+}
+
+.chapter-subtitle {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 40px;
+  padding-left: 20px;
+  letter-spacing: 1px;
+}
+
+.chapter p {
+  margin-bottom: 18px;
+  font-size: 16.5px;
+  text-align: justify;
+  color: var(--text-primary);
+  opacity: 0.92;
+}
+
+.chapter .scene-break {
+  text-align: center;
+  margin: 40px 0;
+  color: var(--text-muted);
+  font-size: 14px;
+  letter-spacing: 8px;
+}
+
+.chapter .dialogue {
+  color: var(--text-primary);
+  opacity: 1;
+}
+
+.chapter .thought {
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.chapter .emphasis {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.chapter .system-text {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 13px;
+  color: var(--text-muted);
+  padding: 12px 16px;
+  border-left: 2px solid var(--border);
+  margin: 24px 0;
+  line-height: 1.7;
+}
+
+/* ===== CHARACTER DETAIL MODAL ===== */
+.char-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  animation: fadeIn 0.3s ease;
+}
+
+.char-modal-overlay.active { display: flex; }
+
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.char-modal {
+  width: 520px;
+  max-height: 85vh;
+  background: var(--bg-card);
+  border-radius: 16px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  animation: modalSlideUp 0.4s ease;
+}
+
+@keyframes modalSlideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.char-modal-header {
+  height: 200px;
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  padding: 24px 28px;
+}
+
+.char-modal-header .modal-avatar {
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  border: 3px solid var(--bg-card);
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.char-modal-header .modal-avatar svg { width: 100%; height: 100%; }
+
+.char-modal-header .modal-name-block {
+  margin-left: 16px;
+  position: relative;
+  z-index: 2;
+  padding-bottom: 4px;
+}
+
+.char-modal-header .modal-name {
+  font-size: 24px;
+  font-weight: 700;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+}
+
+.char-modal-header .modal-title {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 13px;
+  color: rgba(255,255,255,0.7);
+}
+
+.char-modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(0,0,0,0.4);
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+  transition: background 0.2s;
+}
+
+.char-modal-close:hover { background: rgba(0,0,0,0.6); }
+
+.char-modal-body {
+  padding: 24px 28px 32px;
+  overflow-y: auto;
+  max-height: calc(85vh - 200px);
+}
+
+.char-modal-body::-webkit-scrollbar { width: 4px; }
+.char-modal-body::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+.char-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.char-stat {
+  background: var(--bg-secondary);
+  border-radius: 8px;
+  padding: 12px;
+  text-align: center;
+}
+
+.char-stat .stat-label {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-bottom: 4px;
+}
+
+.char-stat .stat-value {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.char-bio-section {
+  margin-bottom: 16px;
+}
+
+.char-bio-section h4 {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  margin-bottom: 8px;
+}
+
+.char-bio-section p {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 14px;
+  line-height: 1.8;
+  color: var(--text-secondary);
+}
+
+/* ===== MOBILE TOGGLE ===== */
+.menu-toggle {
+  display: none;
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 500;
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  font-size: 20px;
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 768px) {
+  .sidebar { position: fixed; z-index: 400; transform: translateX(-100%); }
+  .sidebar.open { transform: translateX(0); }
+  .menu-toggle { display: flex; }
+  .progress-bar { left: 0; }
+  .reading-area { padding: 60px 20px 120px; }
+}
+
+/* ===== BOOK COVER ===== */
+.book-cover {
+  text-align: center;
+  padding: 100px 20px 80px;
+  margin-bottom: 40px;
+}
+
+.book-cover .cover-title {
+  font-size: 72px;
+  font-weight: 900;
+  color: var(--accent);
+  letter-spacing: 20px;
+  margin-bottom: 16px;
+  text-shadow: 0 0 60px rgba(255, 77, 53, 0.3);
+}
+
+.book-cover .cover-genre {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 14px;
+  color: var(--text-muted);
+  letter-spacing: 4px;
+  margin-bottom: 32px;
+}
+
+.book-cover .cover-tagline {
+  font-size: 15px;
+  color: var(--text-secondary);
+  max-width: 480px;
+  margin: 0 auto;
+  line-height: 2;
+}
+
+.book-cover .cover-line {
+  width: 60px;
+  height: 2px;
+  background: var(--accent);
+  margin: 32px auto;
+  opacity: 0.5;
+}
+
+.book-cover .cover-team {
+  font-family: 'Noto Sans SC', sans-serif;
+  font-size: 13px;
+  color: var(--text-muted);
+  letter-spacing: 8px;
+}
+
+/* Character portraits in cover */
+.cover-characters {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  margin: 40px auto 0;
+  max-width: 440px;
+}
+
+.cover-char-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--border);
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.cover-char-icon:hover {
+  transform: scale(1.15);
+  border-color: var(--accent);
+}
+
+.cover-char-icon svg { width: 100%; height: 100%; }
+</style>
+</head>
+<body>
+
+<button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+
+<div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+
+<div class="app-container">
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h1>余 烬</h1>
+      <div class="subtitle">EMBERS — 科幻群像长篇</div>
+    </div>
+
+    <div class="sidebar-tabs">
+      <div class="sidebar-tab active" onclick="switchTab('chapters')">目录</div>
+      <div class="sidebar-tab" onclick="switchTab('characters')">角色</div>
+    </div>
+
+    <div class="sidebar-content">
+      <div class="chapter-list" id="chapterList"></div>
+      <div class="character-list" id="characterList">
+        <!-- Yan -->
+        <div class="char-card" onclick="openCharModal('yan')">
+          <div class="char-card-inner">
+            <div class="char-avatar" id="avatar-yan-sidebar"></div>
+            <div class="char-info">
+              <div class="name" style="color:var(--yan-color)">焰</div>
+              <div class="role">灼野小队 · 队长</div>
+              <div class="ability-tag" style="background:rgba(255,77,53,0.15);color:var(--yan-color)">能量操控 · S级</div>
+            </div>
+          </div>
+        </div>
+        <!-- Shen Mu -->
+        <div class="char-card" onclick="openCharModal('shenmu')">
+          <div class="char-card-inner">
+            <div class="char-avatar" id="avatar-shenmu-sidebar"></div>
+            <div class="char-info">
+              <div class="name" style="color:var(--shenmu-color)">沈暮</div>
+              <div class="role">灼野小队 · 信息战专家</div>
+              <div class="ability-tag" style="background:rgba(77,166,255,0.15);color:var(--shenmu-color)">感知网络 · B+</div>
+            </div>
+          </div>
+        </div>
+        <!-- Su Tang -->
+        <div class="char-card" onclick="openCharModal('sutang')">
+          <div class="char-card-inner">
+            <div class="char-avatar" id="avatar-sutang-sidebar"></div>
+            <div class="char-info">
+              <div class="name" style="color:var(--sutang-color)">苏棠</div>
+              <div class="role">灼野小队 · 战地医疗</div>
+              <div class="ability-tag" style="background:rgba(77,255,136,0.15);color:var(--sutang-color)">生物修复 · B</div>
+            </div>
+          </div>
+        </div>
+        <!-- Lu Yu -->
+        <div class="char-card" onclick="openCharModal('luyu')">
+          <div class="char-card-inner">
+            <div class="char-avatar" id="avatar-luyu-sidebar"></div>
+            <div class="char-info">
+              <div class="name" style="color:var(--luyu-color)">陆屿</div>
+              <div class="role">灼野小队 · 战场工程师</div>
+              <div class="ability-tag" style="background:rgba(176,184,196,0.15);color:var(--luyu-color)">物质重构 · B+</div>
+            </div>
+          </div>
+        </div>
+        <!-- Jiang Xue -->
+        <div class="char-card" onclick="openCharModal('jiangxue')">
+          <div class="char-card-inner">
+            <div class="char-avatar" id="avatar-jiangxue-sidebar"></div>
+            <div class="char-info">
+              <div class="name" style="color:var(--jiangxue-color)">姜雪</div>
+              <div class="role">灼野小队 · 远程打击</div>
+              <div class="ability-tag" style="background:rgba(200,216,255,0.15);color:var(--jiangxue-color)">相位偏移 · A-</div>
+            </div>
+          </div>
+        </div>
+        <!-- Pei Jin -->
+        <div class="char-card" onclick="openCharModal('peijin')">
+          <div class="char-card-inner">
+            <div class="char-avatar" id="avatar-peijin-sidebar"></div>
+            <div class="char-info">
+              <div class="name" style="color:var(--peijin-color)">裴今</div>
+              <div class="role">灼野小队 · 概率干涉者</div>
+              <div class="ability-tag" style="background:rgba(255,215,0,0.15);color:var(--peijin-color)">概率干涉 · C+→?</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </aside>
+
+  <!-- MAIN READING AREA -->
+  <main class="main-content" id="mainContent">
+    <div class="reading-area">
+
+      <!-- BOOK COVER -->
+      <div class="book-cover" id="cover">
+        <div class="cover-title">余烬</div>
+        <div class="cover-genre">科幻 · 群像 · 成长</div>
+        <div class="cover-line"></div>
+        <div class="cover-tagline">
+          在所有星辰熄灭之后，<br>
+          最后的火种从不是独自燃烧的。
+        </div>
+        <div class="cover-line"></div>
+        <div class="cover-team">灼 野 小 队</div>
+        <a href="https://www.figma.com/design/zUxUBg7x4B6JAnJDmmNmbb" target="_blank" 
+           style="display:inline-block;margin-top:24px;font-family:'Noto Sans SC',sans-serif;font-size:12px;color:var(--text-muted);text-decoration:none;padding:8px 20px;border:1px solid var(--border);border-radius:20px;transition:all 0.2s;letter-spacing:1px;"
+           onmouseover="this.style.borderColor='var(--accent)';this.style.color='var(--accent)'" 
+           onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--text-muted)'">
+          ◈ 在 Figma 查看角色立绘设计
+        </a>
+        <div class="cover-characters" id="coverCharacters"></div>
+      </div>
+
+      <!-- ==================== 序章 ==================== -->
+      <div class="chapter" id="ch0">
+        <div class="chapter-title">序章 · 独火</div>
+        <div class="chapter-subtitle">新历187年 · 北区第七隔离带</div>
+
+        <p>警报声已经响了四十分钟。</p>
+        <p>红色的应急灯在走廊里一明一灭，像一颗垂死的心脏。空气中弥漫着烧焦绝缘层的味道，混合着某种更深层的、来自异变体的腥甜气息——那是一种会让普通人头晕的信息素。整座废弃的能源站被异变体占据了三天，黎明局派出的前两支小队全军覆没，尸体至今没有回收。第三支队伍在进入核心区后失联，通讯频道里最后传出的是一声被截断的尖叫。</p>
+        <p>然后他们派了她。</p>
+        <p>不是一支队伍。是一个人。</p>
+        <p>焰站在能源站的正门前，红色短发被夜风吹得微微翘起。她个子很高，在女性中尤为显眼，穿着黎明局制式的黑色作战服，袖口磨得发白。她没有戴头盔——指挥部曾经为这个习惯和她争论过无数次，最后放弃了。不是因为她固执，而是因为他们终于承认：她不需要头盔。</p>
+        <p>她不需要任何防护。因为她本身就是一件武器。</p>
+        <p>通讯器里传来指挥中心的声音，带着细微的电流杂音："代号焰，确认目标——清除核心区S级异变体，回收能源核心。单独行动许可已下达。请注意，前三支队伍共计十七人失联，核心区内部结构可能已被异变体改造，原有地图不再可靠——"</p>
+        <p class="dialogue">"知道了。"</p>
+        <p>焰关掉了通讯器。不是因为信息没用，而是因为那些话会让她分心。十七个人。她不想在战斗前去想那些脸和名字。</p>
+        <p>她抬起右手。</p>
+        <p>空气开始扭曲。热浪从她的掌心向外扩散，地面上的积水瞬间蒸发成一团白雾。她的眼瞳从深棕色渐变为明亮的琥珀色，虹膜深处像是有什么东西在缓慢燃烧——不是比喻，而是字面意义上的燃烧。那是能量在她体内共振的外显特征。</p>
+        <p>这就是她的异能——<span class="emphasis">能量操控</span>。</p>
+        <p>她可以吸收周围环境中一切形式的能量——热能、动能、电磁能、甚至低剂量辐射——将其储存在体内的某种未知介质中，然后以任何她需要的形式释放出去。黎明局的异能等级评定系统中，她的评级是A+，距离传说中的S级只有半步之遥。</p>
+        <p>但评级系统衡量的是"可控输出功率"。</p>
+        <p>焰从来不在意什么叫"可控"。</p>
+        <p>她推开了能源站的大门。铁门在她手掌的高温下微微变形，发出一声低沉的呻吟。里面很黑，但她不需要光——她能感知到空间中每一丝能量的流动，像一张由无数细线织成的三维网格。异变体的生物电信号在网格中跳动，红色的、躁动的，像一群挤在暗处的心脏。</p>
+        <p>她数了数。</p>
+        <p>二十七个。</p>
+        <p>她走了进去。</p>
+
+        <div class="scene-break">· · ·</div>
+
+        <p>三分钟后，第一声爆炸从能源站内部传出。橙红色的火光从窗户里涌出来，像是建筑物自己在呕吐。</p>
+        <p>七分钟后，第二声。比第一次更沉，更闷，像一只巨大的拳头从内部捶打墙壁。</p>
+        <p>第十一分钟，整座能源站的东翼在一团白光中坍塌了。钢梁扭曲着向下沉陷，混凝土碎块溅出几十米远。在外围待命的后勤人员不得不向后撤退。</p>
+        <p>第十四分钟，焰从正门走出来。</p>
+        <p>她手里拎着回收箱，里面装着完好无损的能源核心——那个在三支队伍的覆灭中幸存的东西，在她手里像是被顺手捡起的便利店购物袋。她的作战服左袖烧掉了一半，露出手臂上几道深浅不一的旧伤疤。那些伤疤的纹路不像是外力造成的，更像是什么东西从皮肤内部灼烧出来的。</p>
+        <p>她重新打开通讯器："任务完成。异变体已清除，全部二十七个。另外——"她顿了一下，看了一眼身后正在冒烟的废墟，"东翼塌了。"</p>
+        <p>通讯频道里沉默了很久。</p>
+        <p class="dialogue">"……焰，你知道东翼的修复成本是多少吗？"</p>
+        <p class="dialogue">"不知道，也不想知道。建筑可以重建，对吧？"</p>
+        <p>她没有等回答，关掉了通讯器，独自走进了夜色里。</p>
+        <p>夜风很凉。她的体温比正常人高三度——这是长期使用异能的副作用之一。她已经习惯了这种永远比周围环境更热的感觉，就像她习惯了独自走路。</p>
+        <p>这是焰第一百零三次单独执行任务。</p>
+        <p>也是她最后一次。</p>
+      </div>
+
+      <!-- ==================== 第一章 ==================== -->
+      <div class="chapter" id="ch1">
+        <div class="chapter-title">第一章 · 灰烬中的种子</div>
+        <div class="chapter-subtitle">黎明局总部 · 中央管制区</div>
+
+        <p>黎明局总部坐落在新历政府的中央管制区，一座嵌入地下两百米的庞大建筑群。地面上只露出一个不起眼的入口——灰色混凝土，没有标识，没有守卫，看起来像一道被遗忘的伤疤。真正的安保系统藏在目光无法触及的地方：声波阵列、生物特征扫描、以及一门隐藏在天花板上的电磁脉冲炮。</p>
+        <p>焰穿过六道安检门——其中三道为她自动提升了热容许阈值，因为她的体温会触发常规火灾警报。</p>
+        <p>她走进作战指挥室的时候，局长秦远已经等了她二十分钟。</p>
+        <p class="dialogue">"坐。"</p>
+        <p>焰没坐。她靠在墙边，双臂交叉在胸前。从这个角度她能看到指挥室的全息投影屏上正在显示她的档案——不是普通版本，是权限最高的完整版。那意味着秦远今天要和她谈的不是普通的事。</p>
+        <p>秦远五十多岁，头发灰白，长着一张让人很难判断情绪的脸。他是黎明局建立以来的第三任局长，也是唯一一个没有异能却能让所有异能者闭嘴的人。不是靠恐惧，是靠一种更复杂的东西。</p>
+        <p>他看着投影屏上的数据——一百零三次单独任务，成功率百分之百。附带建筑损毁报告四十七份、友军误伤报告十二份、以及一份长达三页的投诉联名信，由七个不同部门联合签署，核心诉求是"请不要再让代号'焰'的异能者在有其他人类的区域执行任务"。</p>
+        <p class="dialogue">"组织决定给你一个小队。"秦远说。</p>
+        <p class="dialogue">"不需要。"</p>
+        <p class="dialogue">"这不是商量。"秦远抬起头。他的眼神不像是在看一个下属，更像是在看一块璞玉——知道它的价值，也知道它离完成品还差多远。"焰，你的能力等级已经触碰到A+的上限。你知道为什么你进不了S级吗？"</p>
+        <p>焰没说话。她知道这个问题。她不止一次地在深夜里问过自己。她的输出功率明明已经超过了许多老牌A+的上限，但在每次正式评定时，结果总是卡在那条线上。</p>
+        <p class="dialogue">"因为S级不是靠单纯的功率突破就能达到的。"秦远关掉投影，站起来，走到窗前——这里的"窗"是一块模拟外部环境的全息屏幕，此刻显示着黎明前的天空。"S级的完整定义是：'能够在任何复杂环境中，实现稳定的、可持续的战略级输出，且对友方造成零附带损伤。'你的输出功率早就够了，但你缺乏稳定性。你不是不够强——你是太强了，强到开始失控。而你自己甚至意识不到这一点。"</p>
+        <p>焰的手指微微收紧了一下。她想反驳，但她的身体比她的嘴更诚实——右手手臂上那些伤疤隐隐发痒，像是在提醒她什么。最近几次任务中，她的能量释放越来越难以精确控制。不是释放不出来，而是释放出来的比她预期的要多。就像一个水龙头的阀门正在慢慢松动。</p>
+        <p>秦远从抽屉里取出一份文件，投影在焰面前。</p>
+        <p class="dialogue">"小队编号'灼野'，六人编制，你是队长。成员已经选好了。明天报到。"</p>
+        <p>焰扫了一眼名单。</p>
+        <div class="system-text">
+          <strong>沈暮</strong>，感知系异能者，评级B+。专长：信息战、电子干扰。备注：原第四分析组组长，因身体原因从一线退下。<br>
+          <strong>苏棠</strong>，生物系异能者，评级B。专长：战地医疗、生物修复。备注：从医疗部调入，零实战经验。<br>
+          <strong>陆屿</strong>，物质系异能者，评级B+。专长：装备改造、战场工程。备注：原军工研究院，因违纪处分转调。<br>
+          <strong>姜雪</strong>，空间系异能者，评级A-。专长：远程打击、渗透作战。备注：原特别行动组成员，因个人原因申请调离。<br>
+          <strong>裴今</strong>，概率系异能者，评级C+。专长：未明确。备注：本年度异能觉醒者，十九岁。
+        </div>
+        <p>焰读完之后沉默了几秒。</p>
+        <p class="dialogue">"一个病号、一个新手、一个刺头、一个应激的老兵，还有一个——C+？"她的声音终于有了起伏，是压不住的质疑，"秦远，你在开什么玩笑？"</p>
+        <p class="dialogue">"没在开玩笑。"秦远的语气依然没有变化——这个人好像不具备情绪波动这个功能，"这是组织从全局三百七十名在役异能者中筛选出来的。每个人入选都有理由，而那些理由不是你现在能理解的。"</p>
+        <p class="dialogue">"我不需要队友。"</p>
+        <p class="dialogue">"你说得对，你不需要。"秦远看着她，忽然说了一句奇怪的话，"但他们需要你。而你不知道的是——你更需要他们。"</p>
+        <p>焰想说"你错了"，但话到嘴边吞了回去。不是因为她觉得秦远可能是对的，而是因为她在他的眼睛里看到了某种她很少在别人脸上看到的东西——不是信任，也不是期待，而是一种提前知道结局的笃定。</p>
+        <p>好像他已经看过了某个焰还没有活到的未来。</p>
+        <p class="dialogue">"明天早上八点，训练场三号。别迟到。"秦远走向门口。</p>
+        <p>焰在空荡荡的指挥室里站了很久。全息窗外的模拟天空开始发亮——不是真正的日出，只是一段循环播放的程序。</p>
+        <p class="thought">灼野。烧过一切的原野。只剩灰烬的荒地。</p>
+        <p>她不知道秦远给这个小队取这个名字是什么意思。但她隐约觉得，灰烬之中也许正在萌发某种她还无法理解的东西。</p>
+      </div>
+
+      <!-- ==================== 第二章 ==================== -->
+      <div class="chapter" id="ch2">
+        <div class="chapter-title">第二章 · 碎片拼图</div>
+        <div class="chapter-subtitle">训练场三号 · 第一次集结</div>
+
+        <p>训练场三号是一片地下空间，面积相当于三个标准足球场，可以模拟二十七种不同的作战地形——从城市废墟到极地冰原。焰八点整到的时候，五个人已经站在场地中央了。</p>
+        <p>她站在入口的阴影里，花了几秒钟观察他们。这是她的习惯——在别人注意到她之前，先把所有人看一遍。</p>
+        <p>第一个引起她注意的是姜雪。</p>
+        <p>姜雪站在最远的角落，背靠着墙，和其他人保持着一种精确的、几乎经过计算的距离。她的头发是极浅的银灰色，扎成利落的低马尾。面容冷硬，颧骨线条分明，眼窝略深，给人一种不属于这个气候带的感觉。她的目光扫过每一个人，然后停在了焰出现的方向——一秒钟的对视，姜雪率先移开了视线。</p>
+        <p>那不是回避。那是确认。她在确认焰的站位、距离、和可能的威胁等级。</p>
+        <p class="thought">老兵的本能。焰在心里想。就算在安全区，她也在画射击线。</p>
+        <p class="dialogue">"你就是焰？"</p>
+        <p>声音从右侧传来。焰转头，看到一个身材不高的年轻女人。短发，戴着一副看起来造价不菲的数据眼镜——镜片上有淡蓝色的光标在跳动，说明她正在同步处理某种数据流。苍白的脸上带着一种冷静到近乎冷漠的表情。</p>
+        <p>焰注意到了她的右腿。轻型外骨骼辅助器从膝盖延伸到脚踝，银灰色的金属支架紧贴在作战裤的外面。不是临时的——从磨损程度看，她已经依赖这个东西至少一年了。</p>
+        <p class="dialogue">"沈暮。"焰说。</p>
+        <p class="dialogue">"你读过我的档案。"沈暮没有意外的样子，"那你应该知道，我的体能测试成绩只有标准线的六成。但我的异能不需要体能——它需要的是带宽，而我的带宽在整个黎明局排名第一。"</p>
+        <p>她说这话的语气不是自夸，而是陈述——就像在报告天气数据。</p>
+        <p class="dialogue">"能打仗吗？"焰问。</p>
+        <p class="dialogue">"我不打仗。"沈暮推了推眼镜，"我让你们知道该怎么打。"</p>
+        <p>焰的目光停了一秒。她没有评价，但她在心里给沈暮记了一笔：这个人知道自己的位置。</p>
+        <p>陆屿正坐在地上，把一块金属板翻来覆去地摆弄。他三十出头，宽肩膀，下巴上有一层永远刮不干净的胡茬。他的手指粗糙，关节突出，指甲缝里嵌着怎么都洗不掉的金属粉末。他穿着工装裤和一件皱巴巴的作战服，看起来像是在仓库里住了三天。</p>
+        <p>他手里那块金属板正在发生微妙的变化——在他指尖的触碰下，普通的合金表面开始产生精密的纹路，像是有一台隐形的CNC机床在工作。物质重构。他在热身。</p>
+        <p>他抬头看了焰一眼：<span class="dialogue">"听说你把第七隔离带的能源站整个炸塌了？"</span></p>
+        <p class="dialogue">"东翼。不是整座。"</p>
+        <p class="dialogue">"啧。"他说不清是夸是讽，把金属板随手一抛，那东西在空中翻转了两圈，落地时已经变成了一只结构精密的金属蝴蝶。"花活。"他自言自语。</p>
+        <p>苏棠站在场地中央，正在整理一个比标准型号大一倍的医疗包。她是那种让人一看就放松警惕的人——圆脸，眉眼柔和，笑起来脸颊上有两个酒窝。她穿着规规矩矩的制式服装，但袖口别了一朵明显不合规的小雏菊干花。</p>
+        <p class="dialogue">"焰队长好！"她看到焰，立刻露出一个灿烂到有些过度的微笑，"我是苏棠，生物系异能者，专精战地医疗和组织修复。虽然我没有实战经验，但是我在医疗部的临床修复数据是——"</p>
+        <p class="dialogue">"战场上不需要数据。"焰打断她。她的声音不算冷，但像一盆凉水。"需要的是在一切都在爆炸的时候还能稳住手的能力。"</p>
+        <p>苏棠的笑容没有消失——它变了。从一种不安的讨好，变成了一种更安静的东西。她低下头，把医疗包的拉链拉好，认真地点了点头。</p>
+        <p class="dialogue">"我会学的。"她说。</p>
+        <p>最后一个人——裴今——坐在一台训练器材上晃着腿。她看起来确实只有十九岁，可能更小。两根短辫子，脸上还有没褪干净的青春痘印。她穿着全新的作战服，领口的标签都没摘干净，一看就是刚从物资处领出来的。</p>
+        <p class="dialogue">"嗨！"她朝焰挥了挥手，声音里有一种不合时宜的欢快，"我是裴今！概率干涉者！你可能觉得C+很低对吧？但是我觉得——"</p>
+        <p class="dialogue">"我确实觉得。"焰说。</p>
+        <p>裴今眨了眨眼，然后出乎意料地笑了。不是尴尬的笑，是一种真正的、像是觉得某个事情很有趣的笑。</p>
+        <p class="dialogue">"没关系，"她说，"反正大家一开始都这么说。"</p>
+        <p>焰看着这五个人，心里的那团始终在燃烧的火焰沉了沉。</p>
+
+        <div class="scene-break">· · ·</div>
+
+        <p class="dialogue">"规则很简单。"焰走到场地中央，声音不大，但每个人都能听到——不是因为训练场安静，而是因为她的声音带着一种天然的、不需要提高音量就能让人注意的质地。"模拟遭遇战。你们五个一起上，目标是在我手上撑过十分钟。"</p>
+        <p>沈暮推了推眼镜：<span class="dialogue">"你认真的？一个A+对五个人？"</span></p>
+        <p class="dialogue">"非常认真。"焰抬起手，指尖跳动着淡金色的能量光弧，在空气中留下转瞬即逝的亮痕。"在此之前，我需要知道每个人的极限在哪里。"</p>
+        <p>她没有说出后半句：她也需要知道，自己是否真的能和别人待在同一个空间里战斗，而不是像往常一样——把一切都烧成灰。</p>
+        <p>那场合练只持续了四分二十秒。</p>
+        <p>焰没有用全力。甚至连三成都没有。但结果依然是碾压性的。她释放了一道低密度的能量脉冲波——在她看来只是"推了一把"——陆屿在第一分钟就被冲击波掀翻在地。苏棠完全不知道如何在战斗中走位，被余波的气浪推倒了两次。裴今倒是展现出了出乎意料的闪避直觉——她在几乎没有视野的情况下连续躲过了两次攻击——但第三次还是被气浪推出了场地边界。</p>
+        <p>唯一表现尚可的是姜雪。她用相位偏移穿过了焰的第一波攻击——身体像是一个幽灵一样直接从能量脉冲中穿了过去。然后她利用焰两次攻击之间零点三秒的间隙精准地近了身，手指几乎触到了焰的衣领。</p>
+        <p>但焰在最后一刻爆发出一道环形能量脉冲，将她弹开了三米。</p>
+        <p>姜雪落地时翻了个身，半跪着稳住，面无表情。</p>
+        <p>沈暮全程没有参与战斗。她坐在场边的折叠椅上，外骨骼辅助器的指示灯稳定地闪着蓝光，数据眼镜上的光标在疯狂地跳动。她在记录——焰的每一个动作，每一次能量释放的频率、角度、持续时间和冷却间隙。</p>
+        <p>合练结束后，训练场里弥漫着一股焦糊味。所有人沉默地坐在各自的位置上，有人喘气，有人检查瘀伤，裴今在揉被撞红的肩膀。</p>
+        <p class="dialogue">"现在你们知道差距了。"焰的声音没有情绪波动。</p>
+        <p class="dialogue">"你这不是合练，"陆屿擦了一下嘴角的血，口气倒是不怎么恼怒，反而像是在点评一场没看过瘾的比赛，"你这是下马威。"</p>
+        <p class="dialogue">"随便你怎么理解。明天同一时间。"焰转身往外走。</p>
+        <p>她走到门口的时候，听到身后沈暮的声音——不紧不慢的，像是在宣读一份技术报告：</p>
+        <p class="dialogue">"你的能量释放在第三分十二秒出现了零点四秒的波动。"</p>
+        <p>焰停住了脚步。</p>
+        <p class="dialogue">"波动期间你的输出功率下降了约百分之十七。如果姜雪的近身再快零点二秒——零点二秒就够——你会被打到。"</p>
+        <p>训练场里安静了。连陆屿都停下了手里的动作。</p>
+        <p>焰没有回头。但她第一次觉得，这五个人里也许有一个值得她认真对待。</p>
+        <p>也是第一次——有人在她的强大面前，看到的不是畏惧，而是破绽。</p>
+      </div>
+
+      <!-- ==================== 第三章 ==================== -->
+      <div class="chapter" id="ch3">
+        <div class="chapter-title">第三章 · 暮色中的网</div>
+        <div class="chapter-subtitle">灼野小队第一次实战 · 南区第三城</div>
+
+        <p>灼野小队的第一次实战来得比预想的都快。</p>
+        <p>新历187年秋，南区第三城发生大规模异变体入侵事件。一种前所未见的虫型异变体从城市下方的旧管网中涌出，数量超过一千，正以每小时三公里的速度向市中心的平民避难所推进。常规部队已经在外围设防，但虫群的推进速度远超预期——它们不是在随机移动，而是在被什么东西指挥。</p>
+        <p>灼野小队被紧急空运至战区。任务目标：渗透虫群后方，找到并摧毁它们的巢穴核心——一个类似中枢神经的生物结构，被认为是指挥所有虫型异变体协同行动的源头。</p>
+        <p>运输机的货舱里灯光昏暗，引擎的低频震动让所有东西都在轻微抖动。</p>
+        <p>苏棠第三次检查她的医疗包了。她的手指不抖——她的手从来不抖，这是生物系异能者的天赋——但她反复拉开拉链又拉上的动作出卖了她的紧张。陆屿在改装他的武器模块，手法熟练得像在削苹果。裴今在啃一块压缩饼干，吃东西的速度说明她不是饿了，而是需要给嘴找点事做。姜雪闭着眼睛，呼吸频率均匀得像一台机器——但焰知道她没有睡。</p>
+        <p>沈暮的数据眼镜投射出一面只有她能看到的全息屏幕，密密麻麻的数据流在镜片上流过。</p>
+        <p class="dialogue">"我已经接入了南区的监控网络和气象站数据。"她的声音平稳，"虫群的分布呈辐射状扩散，中心点在第三城地铁系统的废弃南延段，大约地下四十米。它们的行进路线存在明确的规律性——每一波推进之间有固定的七分钟间隔——这说明有一个信号源在同步控制它们。"</p>
+        <p class="dialogue">"什么信号？"焰问。</p>
+        <p class="dialogue">"频率极低，14.3赫兹，远低于常规生物信号监测范围。是一种生物电脉冲。我花了二十分钟才从环境噪音里把它滤出来。"沈暮调出波形图。"巢穴核心不只是繁殖中心——它是指挥中枢。摧毁它，地面上的虫群就会失去协调能力，变成一盘散沙。"</p>
+        <p>焰看着战术地图：<span class="dialogue">"路线？"</span></p>
+        <p class="dialogue">"地铁隧道。C-7号入口进入，沿南延段推进约一点二公里到达巢穴核心。但是——"</p>
+        <p>沈暮放大了一个区域。地图上那段隧道显示为灰色——数据空白。</p>
+        <p class="dialogue">"隧道内的所有监控设备已离线。不是断电——是被物理破坏了。从C-7入口到巢穴核心这段路，我的感知网络完全覆盖不到。进去之后我什么都看不见。"</p>
+        <p class="dialogue">"那就靠眼睛走。"焰说。</p>
+        <p class="dialogue">"不行。"沈暮的语气非常果断。"你们六双眼睛在地下隧道里能看到的范围不超过三十米。虫群可以在完全黑暗的环境中高速移动。你们会在遭遇战中被包围——而在地下管道里被包围意味着什么，不用我说。"</p>
+        <p>她停顿了三秒。焰后来才知道，在那三秒里，沈暮计算了自己的方案可能导致的伤亡概率、任务失败概率、以及她自己的生存概率。然后她选择了任务成功率最高的那个。</p>
+        <p class="dialogue">"我跟你们一起进去。"</p>
+        <p>陆屿皱眉：<span class="dialogue">"你的腿——"</span></p>
+        <p class="dialogue">"我的异能不用腿。"沈暮的语气没有波动。"听我说。如果隧道里的设备只是物理损坏而不是被电磁脉冲彻底清除，那么残留的硬件中还会保存最后一段数据缓存——也许是几分钟，也许是几十秒的信息。我需要<strong>亲手触碰</strong>那些设备，把我的感知直接灌进去，从残骸中读取最后的数据。远程做不到。信号衰减加上物理损坏，远程接入的成功率低于百分之三。"</p>
+        <p class="dialogue">"你在地下跑不了。"姜雪睁开了眼，声音很冷。不是在反对，而是在陈述一个她认为沈暮必须直面的事实。"如果遭遇异变体——"</p>
+        <p class="dialogue">"所以你们负责保护我。"沈暮看向焰。"队长，这是唯一能保证你们不在地下迷路的方案。当然——你也可以选择不带我，独自冲进去把一切都炸平。你有这个能力。但你上次这么做的时候，塌了一栋楼。"</p>
+        <p>焰注视着沈暮。这个体重大概不到五十公斤、需要外骨骼才能正常行走的女人，脊背笔直地坐在颠簸的货舱里，眼镜后面的眼睛像两汪极深的水——不是温柔的那种深，是你看不到底的那种深。</p>
+        <p class="dialogue">"走。"焰说。</p>
+
+        <div class="scene-break">· · ·</div>
+
+        <p>C-7号入口。地铁隧道的黑暗浓稠得像固体。</p>
+        <p>焰走在最前面，右手持续释放微弱的热辐射作为照明——手掌上浮着一团拳头大小的暖橙色光球，照亮前方大约十米的隧道。姜雪紧跟其后，步伐无声，像一道影子。陆屿在中间，随时准备用物质重构改变地形来应对突发状况。苏棠和裴今在他两侧，苏棠紧握着医疗包的背带，裴今不停地左右张望。</p>
+        <p>沈暮走在队伍的正中央——最安全的位置。她一只手扶着隧道壁上锈蚀的管道保持平衡，另一只手的指尖贴在每一个她经过的设备接口上。每次触碰，她的数据眼镜就会闪烁几下蓝光。</p>
+        <p class="dialogue">"第一段，安全。"她低声说，"异变体大约在三十分钟前经过这里，向东移动。密度不高，二十到三十个体。"</p>
+        <p class="dialogue">"你怎么知道是三十分钟前？"裴今好奇地问。</p>
+        <p class="dialogue">"墙面刮痕处的残余温度。虫型异变体的体表温度比环境高十二度，热量消散速率可以反推时间。"沈暮没有停下脚步，"这不是异能，是物理学。"</p>
+        <p>她们在隧道里推进了近二十分钟。每隔几十米，沈暮就会停下来，将手掌贴在一个被破坏的设备残骸上——有的是监控摄像头，有的是温度传感器，有的是已经锈蚀的通讯中继器。每一次，她都会闭上眼睛，嘴唇微微抿紧，数据眼镜亮起蓝光。</p>
+        <p>焰渐渐意识到，沈暮不仅仅在收集信息。</p>
+        <p>她在<span class="emphasis">画地图</span>。</p>
+        <p>通过触碰每一个残损的设备节点，她把自己的感知网络一段一段地向前延伸。就像一个盲人用指尖读取盲文——不，更像是一个人在漆黑的荒野中，一步一步地点燃火把，在身后留下一条发光的路径。</p>
+        <p>但每一次连接都有代价。焰注意到沈暮的鼻尖开始渗出细密的汗珠。她咬嘴唇的力度越来越重，下唇已经有了浅浅的齿印。第三个节点之后，她的呼吸开始变得不均匀。</p>
+        <p class="dialogue">"可以吗？"焰罕见地问了一句。</p>
+        <p class="dialogue">"还有四个节点。别停。"</p>
+        <p>第七个节点的时候，沈暮的身体猛地一震——她接入了一个严重损坏的数据终端，强行灌入感知的瞬间，已经短路的电路产生了一次反噬。</p>
+        <p>苏棠立刻扑过去。她的双手覆上沈暮的太阳穴，指间流出柔和的绿色光芒——生物修复能力在神经层面运作，安抚因为电磁反噬而痉挛的神经末梢。</p>
+        <p class="dialogue">"没事。"沈暮推开苏棠的手，推得不重，但很坚决。"最后一个。让我完成。"</p>
+        <p>她踉跄着走到最后一个节点——一个被异变体撕成两半的中继器。碎片散落在积水的地面上。沈暮蹲下来，捡起两个碎片重新拼在一起——就像在拼一个只有她能看到完整图案的拼图。然后她把双手按上去。</p>
+        <p>蓝光暴涨。</p>
+        <p>沈暮的数据眼镜投射出一张完整的三维全息地图——巢穴核心的全貌在所有人面前展开。每一条通道、每一个岔路、每一个异变体聚集区都被标注了出来，像一幅精密的军事地图。</p>
+        <p class="dialogue">"核心在前方四百米，地下第三层。"她的声音因为疼痛而微微发颤，但每一个字都清晰得像刻在金属上。"外围约一百五十个个体。核心本体是一个直径四米的生物结构，有三根主神经束连接周围的虫群……通往核心有三条路径。路径A直线距离最短但敌情密度最高；路径C最安全但需要绕行六百米；推荐路径B——敌情密度中等，但中间有一段坍塌的通风管道。陆屿，你能打开那段通道吗？"</p>
+        <p>陆屿看了看数据，沉吟片刻：<span class="dialogue">"给我九十秒。"</span></p>
+        <p class="dialogue">"姜雪，核心外壁的东南方向约三十度角有一个结构薄弱点——虫群的神经束接入口。如果你能从路径B的终点进行一次精确射击，穿透外壁，焰就可以直接把能量灌进核心内部。一击毙命。"</p>
+        <p>姜雪微微点头。</p>
+        <p class="dialogue">"裴今——"沈暮看向最年轻的队员，嘴唇动了一下，像是要说什么但又改了口——"你跟在我身边。如果情况有变，我需要你。"</p>
+        <p>焰安静地听完了整个作战方案。</p>
+        <p>这是她第一次不需要自己制定计划——不是因为偷懒，而是因为她拿到的计划比她自己能想到的任何方案都更好。更完整，更精确，更——合理。</p>
+        <p class="dialogue">"按沈暮的方案走。全队进入战斗状态。"</p>
+        <p>沈暮靠在隧道壁上，神经反馈的疼痛让她微微发抖。苏棠蹲在她身边，无声地维持着治疗。</p>
+        <p class="dialogue">"队长，"沈暮说，嘴角弯了一下——焰第一次看到她笑，"信息就是最强的武器。记住这个。"</p>
+        <p>焰没有回答。但她记住了。</p>
+        <p>从那天起。</p>
+      </div>
+
+      <!-- ==================== 第四章 ==================== -->
+      <div class="chapter" id="ch4">
+        <div class="chapter-title">第四章 · 不碎的人</div>
+        <div class="chapter-subtitle">第三城地下 · 撤退途中</div>
+
+        <p>巢穴核心战打得很顺利。</p>
+        <p>陆屿用物质重构打开了坍塌的通风管道——他把混凝土碎石的分子重新排列成一块块整齐的砖石，向两侧平移，像是在打开一道隐形的门。姜雪精准地击穿了核心外壁的薄弱点——子弹借助相位偏移穿过了一堵半米厚的有机质壁面，在内部留下了一个完美的贯通孔。焰将一道白热的能量洪流通过那个孔灌入核心内部。</p>
+        <p>核心在三秒钟内被彻底摧毁。</p>
+        <p>但她们低估了虫群失去控制后的反应。</p>
+        <p>核心被摧毁的瞬间，地面上一千多只虫型异变体同时陷入了疯狂。它们不再有组织地行动——统一指挥信号消失了——但失去理智的它们比有组织时更加危险。就像一群蚂蚁的蚁后突然死亡，整个族群不是停下来，而是开始毫无目的地暴走。</p>
+        <p>地下隧道里，残余的虫群从四面八方涌来。</p>
+        <p>撤退打得比进攻惨烈十倍。</p>
+
+        <div class="scene-break">· · ·</div>
+
+        <p>陆屿的右臂被一只虫型异变体的利爪撕开了一道口子——不是皮肉伤，是看得见骨头的那种。他用左手把虫子的头按在地上，右手的物质重构能力勉强维持着地面障碍物的结构。姜雪被坍塌的碎石击中了后背，脊椎的剧痛让她的相位偏移能力变得不稳定——有时候穿得过去，有时候穿不过去。</p>
+        <p>焰背着已经无法行走的沈暮跑在最前面——沈暮在强制连接八个设备节点后，双腿完全失去了知觉。但她还在工作——趴在焰的背上用沙哑的声音报告前方的情况，像一台即使外壳烧焦了也不肯关机的机器。</p>
+        <p>然后焰听到了身后的声音。</p>
+        <p>不是一个人的惨叫。是骨头断裂的声音。</p>
+        <p>她停下来回头看。</p>
+        <p>陆屿倒在地上。一只体型异常巨大的虫型异变体从墙壁中破壁而出——不是从前方，是从侧面，从沈暮的地图上标注为"结构安全"的那面墙。地图是对的——在沈暮扫描的时候那面墙确实是安全的。但虫群的行为已经不可预测了。</p>
+        <p>异变体的尾刺刺穿了陆屿的左腿。他闷哼一声，用右手把地面重构成尖刺刺向异变体，但失血让他的异能输出锐减——那些尖刺从地面长出来时参差不齐，像一排发育不良的牙齿。</p>
+        <p>苏棠跪在陆屿身边。</p>
+        <p>不——她不是跪在那里的。她是<span class="emphasis">冲过去</span>的。</p>
+        <p>焰后来复盘过很多次。在那种情况下，一个没有任何战斗能力的医疗兵，面对一只正在攻击队友的异变体——最理性的反应是什么？退后。等战斗结束再救治伤员。等能打的人把威胁解决掉。等一切安全了再出手。</p>
+        <p>但苏棠不是一台计算机。她是一个看到别人流血就会忘记所有理性的人。</p>
+        <p>异变体的第二次攻击到了。尾刺劈下来的角度足以刺穿陆屿的胸腔。</p>
+        <p>苏棠张开双臂。</p>
+        <p>绿色的光芒从她体内爆发出来——不是她平时那种柔和的治疗光辉，而是一道刺目的、近乎固态的绿色光幕。</p>
+        <p><span class="emphasis">生物屏障。</span></p>
+        <p>焰从来不知道苏棠能做到这个。她的异能是生物修复——修复伤口、再生组织——没有任何记录显示她有防御型能力。但在极端情况下，她把修复能力<strong>翻转</strong>了——不是向内修复，而是向外构建。她用自己的生命力编织了一面盾。</p>
+        <p>异变体的尾刺撞在生物屏障上，发出刺耳的嘶鸣。尾刺的尖端被绿色光幕包裹住，表面的有机质开始快速老化、干枯、碎裂——生物修复的反向运用：不是让活的东西生长，而是让活的东西加速衰亡。</p>
+        <p>苏棠的身体在剧烈颤抖。每维持一秒，她的体重就在减轻——生物屏障直接消耗的是她自己的细胞储备。嘴角有血渗出来，但她的双手纹丝不动。</p>
+        <p class="dialogue">"我不会让任何人——"她咬紧牙关，声音从牙缝里挤出来，"——在我面前死掉。"</p>
+        <p>焰放下沈暮，转身冲了回去。一道橙红色的光束穿透了异变体的头部。它在尖啸中倒下，巨大的身躯砸在地上扬起灰尘。</p>
+        <p>苏棠的屏障碎裂了。她摇晃了一下，直直地倒了下去。</p>
+        <p>但在失去意识之前——焰看得很清楚——她的手还按在陆屿的伤口上。微弱的绿光还在流淌。</p>
+        <p>她一直在做两件事。挡住攻击的同时，她没有停止对陆屿的治疗。</p>
+        <p>焰把苏棠抱起来的时候，发现她轻得不真实——生物屏障消耗了她大量的身体储备，体重可能在几秒内减轻了十几斤。她的脸色白得像纸，但嘴角好像还挂着一丝什么。</p>
+        <p>不是微笑。是一种安心。</p>
+        <p class="thought">她在失去意识之前最后确认的不是自己还活着，而是陆屿还活着。</p>
+
+        <div class="scene-break">· · ·</div>
+
+        <p>在医疗舱里，苏棠醒来后说的第一句话是：</p>
+        <p class="dialogue">"陆屿的手臂怎么样了？那个伤口很深，我记得骨膜有损伤，需要进行二次修复，不然可能影响他的精细操控能力——"</p>
+        <p class="dialogue">"你自己都快死了。"陆屿的声音从隔壁病床上传来。他的语气是那种粗声粗气，但如果你仔细听，会发现他说话的时候没有看苏棠——不是因为不在乎，而是因为不好意思。</p>
+        <p class="dialogue">"医生要是先担心自己，那就不是好医生了。"苏棠笑了笑，然后因为扯动伤口而嘶了一声，但笑容没散。</p>
+        <p>焰站在医疗舱门口。她看着苏棠挣扎着要起来检查陆屿伤情的样子——苏棠的两条腿因为生物能量耗竭而暂时失去了知觉，她只能用手臂撑着身体往前挪。</p>
+        <p>焰走过去，按住了她的肩膀。</p>
+        <p class="dialogue">"躺下。陆屿没事。"</p>
+        <p class="dialogue">"但是——"</p>
+        <p class="dialogue">"这是命令。"</p>
+        <p>苏棠看着焰的眼睛。焰的表情没什么变化——至少表面上没有。但苏棠像是在那双琥珀色的眼睛里看到了某种东西，因为她安静地躺了回去。</p>
+        <p class="dialogue">"好。"苏棠说，"那焰队长，你手臂上的旧伤疤，要不要我帮你看看？那些是自损伤，对吧？长期高能量输出造成的组织灼伤。如果你愿意的话，我可以——"</p>
+        <p class="dialogue">"不用。"焰松开手，转身走了。</p>
+        <p>她走出医疗舱之后，在走廊里停了一会儿。</p>
+        <p>她想起秦远说的——"他们每个人都有你不具备的东西。"</p>
+        <p>焰的能量可以摧毁一切。但她不知道怎么保护一个人。</p>
+        <p>苏棠知道。</p>
+      </div>
+
+      <!-- ==================== 第五章 ==================== -->
+      <div class="chapter" id="ch5">
+        <div class="chapter-title">第五章 · 铸者之手</div>
+        <div class="chapter-subtitle">休整期 · 地下四层废弃实验室</div>
+
+        <p>第三城任务之后，灼野小队得到了两周休整期。</p>
+        <p>陆屿在休整期第三天失踪了。</p>
+        <p>不是真的失踪——他把自己关进了黎明局地下四层一间废弃的材料实验室，门锁被他用物质重构改变了分子结构，变成了一块实心的碳化钨合金板。焰去找他的时候，门上还残留着他手掌的温度。</p>
+        <p class="dialogue">"陆屿，开门。"</p>
+        <p class="dialogue">"忙。"里面传来叮叮当当的敲击声和某种高温材料冷却的嘶嘶声。</p>
+        <p class="dialogue">"这是命令。"</p>
+        <p class="dialogue">"违抗了，扣我工资。"</p>
+        <p>焰差点一拳轰开那扇门。她做得到——碳化钨在她的能量输出面前和纸没什么区别。但她忍住了。她不知道自己为什么忍住了。也许是因为她隐约从那些叮叮当当的声音里听出了某种东西——不是懈怠，是专注。一种不应该被打断的专注。</p>
+
+        <div class="scene-break">· · ·</div>
+
+        <p>第五天，沈暮找到了焰。</p>
+        <p class="dialogue">"我查了陆屿过往的完整档案。"沈暮说。她的声音比平时更轻一些，像是在说一件需要小心对待的事。"他在军工研究院的'违纪处分'——你知道具体是什么吗？"</p>
+        <p class="dialogue">"不知道。"</p>
+        <p class="dialogue">"他私自修改了一批标准化作战护甲的生产模具。研究院有严格的规定——所有装备必须按照设计图纸的参数生产，任何修改都需要经过三级审批和四轮测试。但陆屿在例行检测中发现原版设计的脊椎防护区域存在三毫米的结构间隙——一个在测试环境中无法暴露的缺陷，只有在真实战斗中受到特定角度的冲击时才会导致护甲失效。他提交了报告，被驳回了。理由是'测试数据未显示异常'。"</p>
+        <p>焰等着。</p>
+        <p class="dialogue">"然后他自己改了。不是改了一件——他改了整条生产线的模具。等研究院发现的时候，那批护甲已经出厂了四百件。"</p>
+        <p class="dialogue">"结果？"</p>
+        <p class="dialogue">"两个月后的一次行动中，穿着那批护甲的十一名士兵在一次爆炸中幸存。事后分析显示，如果是原版护甲，至少七人会因为脊椎防护间隙导致的碎片穿透而死亡或永久瘫痪。"沈暮的声音平静得几乎听不出感情，"但研究院还是处分了他。因为他违反了流程。"</p>
+        <p>焰沉默了一会儿。</p>
+        <p class="dialogue">"他不是不守规矩。"沈暮说，"他是没办法忍受——明明看到了问题，却假装没看见。这种人在体制里活不下去，但在战场上，他们是最可靠的。"</p>
+        <p>焰第二次去了那扇门前。这次她没有敲门，也没有命令开门。她只是把背靠在门板上，对着空荡荡的走廊说话。</p>
+        <p class="dialogue">"你在做什么？"</p>
+        <p>里面安静了一会儿。</p>
+        <p class="dialogue">"装备。"陆屿的声音从门后传来，沙哑，疲惫，但带着一种焰很熟悉的执拗——和她自己释放能量时那种停不下来的感觉很像。"给苏棠做的。她的异能可以治人但保护不了自己。那天在隧道里她用身体挡了那一下——那种事她还会再做的。她就是那种人。所以她需要一套在她犯蠢的时候能保住她命的东西。"</p>
+        <p>焰没有说话。</p>
+        <p class="dialogue">"还有你的。"</p>
+        <p class="dialogue">"我不需要防具。"</p>
+        <p class="dialogue">"你的能量会反噬。"陆屿的声音忽然变得很认真。"我在合练那天就注意到了——你释放高密度能量的时候，体表组织承受的热应力远超正常阈值。你自己不觉得痛不代表没有伤。你手臂上那些旧伤疤——不全是战斗伤。有一部分是自损，对吧？是你的能量从内部灼伤了你自己。"</p>
+        <p>焰下意识地看了一眼自己手臂上那些她从不在意的疤痕。或者说——那些她一直假装不在意的疤痕。</p>
+        <p class="dialogue">"我在做一种能量导流织物。碳硅复合纤维基底，分子结构重排成蜂窝状导热网络。原理很简单——当你释放能量的时候，这层织物会把多余的热应力均匀导散到全身表面，而不是集中在释放点造成局部灼伤。你可以输出更高的功率，同时不伤害自己。"</p>
+        <p>他说这些的时候语气像在讨论一个工程方案——理性、精确、不带感情色彩。但焰听出来了。他在这间没有窗户的实验室里关了五天，不眠不休。</p>
+        <p class="dialogue">"沈暮的外骨骼我也重新设计了。原版太重，关节活动度不够。新版减重百分之四十，增加了应急弹射功能——零点三秒内把她弹离三米。"</p>
+        <p class="dialogue">"姜雪的狙击枪也改了。她的相位偏移作用在子弹上时会产生微小的弹道曲率偏差，原版枪管没有校准这个——大概没人想过要校准，因为理论上相位偏移不影响弹道。但理论和实际之间差了一个姜雪。"</p>
+        <p class="dialogue">"裴今的比较难。她的异能太特殊了。但我在做一个概率可视化模块——至少能让她更直观地感知自己的能力在影响什么。"</p>
+
+        <div class="scene-break">· · ·</div>
+
+        <p>第七天，门开了。</p>
+        <p>陆屿顶着严重的黑眼圈走出来，下巴上的胡茬已经快变成胡子了。他把一个巨大的金属箱子拖到训练场上，打开来——里面整齐地码放着五套装备，每一套的设计都截然不同。</p>
+        <p>因为每一套都是为一个具体的人量身打造的。</p>
+        <p>苏棠拿到她的防护衣时翻来覆去地看了很久。白色轻薄内衬，看起来脆弱得一扯就会断，但她试着用力拉扯时纤维纹丝不动。</p>
+        <p class="dialogue">"抗穿刺、抗冲击、自修复。"陆屿说得很随意，像在报菜名，"胸口位置加了一层生物信号增幅层，可以让你的修复能力传导距离增加百分之三十左右。"</p>
+        <p>苏棠的眼眶红了。</p>
+        <p class="dialogue">"别哭。"陆屿别过脸去。</p>
+        <p class="dialogue">"我没哭。"苏棠吸了吸鼻子，"过敏。"</p>
+        <p>焰穿上能量导流织物的时候，感觉像是被某种温和的、有呼吸的力量包裹住了。她试着释放了一次高密度能量脉冲——那种伴随了她整个战斗生涯的灼痛感<strong>消失了</strong>。能量像水一样在织物的导流网络中均匀散开，手臂上没有出现任何新的灼伤痕迹。</p>
+        <p>她低头看着自己的手。第一次，释放能量不痛了。</p>
+        <p class="dialogue">"不错。"焰说。这是她能给出的最高评价。</p>
+        <p>陆屿哼了一声，已经弯腰在修改裴今的概率可视化模块了——他对第一版显然不满意，正在用物质重构微调内部的传感器阵列。</p>
+        <p>焰看着他弯腰工作的背影。他的手指被高温灼伤了好几处，指节上缠着歪歪扭扭的绷带——那是他自己缠的，缠得很糟糕。</p>
+        <p>陆屿的异能是物质重构——他可以改变任何物质的结构。但他真正改变的，从来不是物质本身。</p>
+        <p>他改变的是可能性。</p>
+        <p>他把废铁变成盾牌，把钢板变成翅膀，把冰冷的材料变成可以保护人的东西。</p>
+      </div>
+
+      <!-- ==================== 第六章 ==================== -->
+      <div class="chapter" id="ch6">
+        <div class="chapter-title">第六章 · 看不见的弹道</div>
+        <div class="chapter-subtitle">第七次任务 · 西区废墟群</div>
+
+        <p>灼野小队的名声在黎明局内部逐渐传开了。不是因为焰——焰的强大早已人尽皆知——而是因为这支队伍开始展现出一种奇特的化学反应。他们的建筑损毁报告从四十七份降到了零。任务效率比焰单独行动时提升了百分之三十。更关键的是：零伤亡。</p>
+        <p>但有一件事始终没有改变——姜雪从不在有队友的情况下使用全功率射击。</p>
+        <p>焰注意到了。在每一次任务中，姜雪都会刻意控制她的相位偏移能力——只用六成、七成、最多八成。她的射击依然精准到令人惊叹，但焰知道那不是她的全部。就像一个歌手永远只用胸声唱歌，从不打开头腔——你听到的很好，但你知道还有更好的被锁在了什么地方。</p>
+        <p>沈暮在一个晚上告诉了焰原因。</p>
+        <p class="dialogue">"一年前，'裂隙'行动。目标是一个S级异变体巢穴。姜雪是狙击支援。她的搭档叫林峥——跟了她三年的新人。"</p>
+        <p>沈暮的声音很轻，像是怕惊动什么。</p>
+        <p class="dialogue">"行动中遇到了意外——S级异变体拥有反射型护盾。姜雪用全功率相位偏移穿透了护盾进行射击，命中了核心。但护盾被穿透后产生了能量反冲——一道她没有预见到的、沿穿透路径反向传播的冲击波。"</p>
+        <p>焰闭上了眼睛。她已经猜到了结局。</p>
+        <p class="dialogue">"林峥当时在姜雪和目标之间的掩护位。反冲的路径正好穿过了那个位置。"</p>
+        <p>沈暮停了几秒。</p>
+        <p class="dialogue">"调查报告的结论是'不可预见因素导致的意外伤亡'。没有人怪她。但姜雪怪她自己。从那以后，她再也没有在有队友在场的情况下使用全功率。她的评级从A降到了A-——不是因为能力退化，而是因为她在刻意削弱自己。"</p>
+        <p class="dialogue">"你想让我做什么？"焰问。</p>
+        <p class="dialogue">"什么也不做。"沈暮说，"这不是别人能解开的结。它只能等——等到某个时刻，她自己选择面对。"</p>
+
+        <div class="scene-break">· · ·</div>
+
+        <p>那个时刻来了。</p>
+        <p>第七次任务，西区废墟群清剿。本该是一次B级难度的常规行动——清理盘踞在废弃工业区的一群低等异变体。灼野小队加上一个配合行动的常规小队，总共十二人。</p>
+        <p>但情报出了错。</p>
+        <p>废墟群里不是B级异变体。是一只<span class="emphasis">伪装型S级异变体</span>——它能操控周围的低级异变体作为伪装，同时模拟低级异变体的生物信号来欺骗探测系统。当S级异变体暴露真身时，常规小队的四个人已经进入了它的攻击范围。</p>
+        <p>焰在异变体出现的第一秒就释放了全功率攻击。导流织物完美运作——她的输出功率比以往任何时候都高，橙红色的光柱撕裂了废墟群的夜空。但S级异变体的外壳硬度远超预期。她的攻击只留下了一道焦痕。</p>
+        <p>异变体反击了。它的尾部像一条钢鞭横扫，直接将一栋建筑抽向了常规小队。碎石如暴雨倾泻。苏棠和陆屿联手防御——她展开生物屏障，他重构地面为弧形钢墙——勉强挡住了大部分碎石。裴今在最后一刻拉了苏棠一把，让一块巨大的混凝土梁擦着她的肩膀砸在地上。</p>
+        <p>焰拦在了最前面。她张开双臂形成能量护盾。异变体的利爪撞上护盾，震得她双臂发麻，导流织物发出高温警报。</p>
+        <p class="dialogue">"沈暮！弱点！"</p>
+        <p class="dialogue">"在分析！它的外壳存在共振频率——我需要更多数据——焰，你能再撑三十秒吗？"</p>
+        <p class="dialogue">"十五秒。"</p>
+        <p class="dialogue">"姜雪。"沈暮的声音忽然转向了另一个频道，非常平静。</p>
+        <p>通讯器里一片沉默。</p>
+        <p class="dialogue">"姜雪，我找到了它的弱点。腹部第三节甲片和第四节之间的缝隙，宽度不到四厘米。那里是神经节枢纽。如果你能用全功率相位偏移穿透外壳，精准命中神经节——它会瘫痪至少十秒。十秒够焰积蓄一次终结攻击。"</p>
+        <p>沉默。</p>
+        <p class="dialogue">"射击路径会经过焰的位置。"姜雪的声音终于响起。冷，低，像是从很深的水底浮上来的。"如果相位偏移的能量有残余反冲——"</p>
+        <p class="dialogue">"不会。"沈暮的声音不容置疑。"陆屿改过你的枪。补偿纹路可以消除弹道偏差。陆屿？"</p>
+        <p class="dialogue">"我确认。"陆屿的声音从碎石堆后面传来，沉稳得像一块石头。"我用我的手担保——就是这双做了你那把枪的手。"</p>
+        <p>通讯器里又是一段沉默。焰的护盾开始出现裂纹。</p>
+        <p class="dialogue">"姜雪。"焰开口了。她的声音不像在下命令。"开枪。"</p>
+        <p class="dialogue">"……你不怕？"</p>
+        <p class="dialogue">"怕什么？"</p>
+        <p class="dialogue">"子弹会从你的头顶三十厘米处经过。"</p>
+        <p>焰笑了一下。大概是她加入灼野以来第一次笑——不是嘴角动一下的那种，是嘴角微微上扬、眼睛里有光的那种。</p>
+        <p class="dialogue">"我信陆屿的手艺。"</p>
+
+        <div class="scene-break">· · ·</div>
+
+        <p>五百米外的废墟楼顶。</p>
+        <p>风速7.2米每秒。湿度73%。目标在不规则移动。瞄准镜里，S级异变体的腹部甲片缝隙时隐时现——不到四厘米宽。</p>
+        <p>射击路径从焰的头顶三十厘米处经过。</p>
+        <p>三十厘米。</p>
+        <p>一年前，林峥也是在那样的距离上倒下的。</p>
+        <p>姜雪的手指扣在扳机上。稳定得像一台校准完毕的机器。但她的眼睛里有什么东西在颤抖——不是恐惧，是记忆。一年来她用尽全力封锁的记忆。</p>
+        <p class="thought">林峥笑起来有虎牙。她喜欢在任务结束后去便利店买草莓牛奶。她说"姜姐，我以后也要成为你这样的射手"。她的声音——</p>
+        <p>然后裴今的声音出现在了她的通讯频道里。不知道什么时候接入的。</p>
+        <p class="dialogue">"姜雪姐。"声音很轻，带着一种奇异的笃定。"这一枪，会中的。"</p>
+        <p>裴今的手在发光。淡淡的、几乎看不见的金色光点从指尖飘散出去，像一群无声的萤火虫。概率干涉——她不能改变物理定律，但她可以在无数个可能的未来中，轻轻推一把。</p>
+        <p>只是一点点。但有时候，一点点就够了。</p>
+        <p>姜雪深吸一口气。</p>
+        <p>她想起林峥。想起那声枪响之后她再也没有回头。她一直以为不再全力射击是赎罪。但此刻她忽然明白了——林峥绝不会希望她用自我束缚来纪念自己。</p>
+        <p>林峥会希望她开枪。在需要保护队友的时候，毫不犹豫地开枪。</p>
+        <p>姜雪的眼神变了。颤抖消失了。瞳孔缩到了针尖大小。</p>
+        <p>全功率释放。</p>
+        <p>子弹脱膛。相位偏移激活。弹头的物理状态在出膛的瞬间发生偏转——它穿过了三堵墙壁、两根断裂的钢梁，像一个幽灵一样掠过焰的头顶——</p>
+        <p>三十厘米。纹丝不差。</p>
+        <p>子弹在重新凝实的瞬间，精准钻入了那道四厘米的缝隙。</p>
+        <p>异变体哀鸣。所有节肢瞬间瘫软。</p>
+        <p class="dialogue">"现在！"沈暮喊道。</p>
+        <p>焰撤掉护盾。双手合拢。白热光球。导流织物全功率运转。</p>
+        <p>她把那颗光球推了出去。</p>
+        <p>白光吞没了一切。</p>
+        <p>当一切平息时，S级异变体的躯体已经瘫倒在废墟中，彻底失去了生命反应。</p>
+        <p>焰站在原地，能感受到子弹掠过时那一丝极细微的气流。她朝五百米外的楼顶方向微微抬了一下下巴。</p>
+        <p>瞄准镜里，姜雪看到了。</p>
+        <p>她放下枪。枪管滚烫。手指也在微微发烫。</p>
+        <p>但有什么东西——一种捆缚了她整整一年的、沉重的、像铁链一样的东西——轻了。</p>
+        <p class="dialogue">"射击完毕。目标命中。"她的声音传进通讯器，平静如水。</p>
+        <p>一小段沉默。然后裴今的声音欢快地响起：<span class="dialogue">"哇哦——！姜雪姐好帅——！"</span></p>
+        <p class="dialogue">"闭嘴。"姜雪说。</p>
+        <p>但她的嘴角动了一下。</p>
+      </div>
+
+      <!-- ==================== 第七章 ==================== -->
+      <div class="chapter" id="ch7">
+        <div class="chapter-title">第七章 · 微光织网</div>
+        <div class="chapter-subtitle">极夜行动 · 极北冰原地下城</div>
+
+        <p>新历188年。灼野小队成立八个月。</p>
+        <p>焰的评级升为A++。但更让指挥部意外的是，灼野小队作为整体的战斗力评估已经超过了黎明局任何由单个A级异能者领衔的队伍。不是因为焰变强了——虽然她确实变强了——而是因为这六个人之间产生了某种不可量化的东西。</p>
+        <p>但裴今始终是个谜。</p>
+        <p>她的评级还是C+。概率干涉在测试中几乎无法量化——有时候她能让硬币连续二十次正面朝上，有时候连一杯水都接不稳。沈暮做过大量数据分析，结论是：裴今的能力受情绪状态和直觉活跃度的影响极大，但触发机制不明。</p>
+        <p class="dialogue">"说白了就是玄学。"陆屿给出了他的评价。</p>
+        <p>裴今自己也不太清楚。她只是觉得，在某些时候，她能"感觉到"事情应该往哪个方向走。像是站在无数条分岔的河流前，她能看到哪一条会通向大海。但她选不了。她只能推——轻轻地推一下。</p>
+
+        <div class="scene-break">· · ·</div>
+
+        <p>"极夜"行动。一个反政府武装组织"新序"在极北冰原的地下城中秘密研发人工异能觉醒药剂。药剂有极高的失败率——百分之九十五的受试者会异变，变成比普通异变体更危险的人造异变体。</p>
+        <p>灼野小队奉命渗透并摧毁实验基地。</p>
+        <p>渗透过程比预想的顺利——沈暮入侵安保系统，姜雪在外围无声清除巡逻队，陆屿打通了核心实验区的通道。焰带队深入，找到了药剂实验室。</p>
+        <p>然后她们发现了冷冻舱。</p>
+        <p>一百二十七个。每个里面躺着一个人。</p>
+        <p class="dialogue">"这些是等待觉醒的志愿者。"沈暮扫描数据终端后说，"还没有被注射药剂。他们还是正常人。但——"她的声音紧了一下，"基地自毁程序已经被激活了。倒计时八分钟。"</p>
+        <p>八分钟。一百二十七个冷冻舱。每个舱的安全解冻需要三分钟。</p>
+        <p>强制开启会造成细胞破裂——人会在开舱的瞬间死亡。</p>
+        <p>所有人都看向焰。</p>
+        <p class="dialogue">"全部带走。"焰说。</p>
+        <p class="dialogue">"不可能。"沈暮立刻否定。</p>
+        <p class="dialogue">"陆屿？"</p>
+        <p>陆屿已经在检查冷冻舱结构了。他的手掌贴在舱体上，物质重构在分子层面扫描——<span class="dialogue">"我可以在不破坏冷冻系统的前提下打开舱门。但一次只能处理一个，每个十五秒。"</span></p>
+        <p>一百二十七个舱，每个十五秒。将近三十二分钟。</p>
+        <p>他们只有八分钟。</p>
+        <p>自毁系统是物理隔离的独立回路，沈暮的感知网络进不去。手动拆除至少二十分钟。</p>
+        <p>死路。</p>
+        <p>焰的手指在发热。体内的能量躁动不安。她几乎想把整个天花板轰开——但她知道自己的能量会伤害冷冻舱里的人。这一次，蛮力不是答案。</p>
+        <p class="dialogue">"焰姐。"</p>
+        <p>裴今的声音很轻。</p>
+        <p>焰转头。裴今站在一排冷冻舱前面，她的数据手环——陆屿做的概率可视化模块——在疯狂闪烁。那些波形在做焰从未见过的震荡。</p>
+        <p class="dialogue">"我能感觉到。"裴今的眼瞳深处有金色的光点浮动。"有一条路。很窄，很小，但是——存在。"</p>
+        <p>她闭上眼睛。手指在空中微微颤动，像是触摸着什么看不见的丝线。</p>
+        <p class="dialogue">"自毁系统的物理回路不是完全独立的。它有一个供电节点和基地主供电系统共用了一段线路。每隔四分十七秒，供电系统会进行一次微秒级的负载平衡切换。在那个切换的瞬间，自毁回路的供电会出现一个极其微小的波动。"</p>
+        <p>沈暮猛地抬头：<span class="dialogue">"你怎么——"</span></p>
+        <p class="dialogue">"我不知道。我只是……看到了。"裴今睁开眼。"如果在那个瞬间，沈暮姐能把感知灌进那个波动——哪怕只有一毫秒——就能接触到自毁回路的控制信号。"</p>
+        <p class="dialogue">"窗口太小了。一毫秒的误差都不能有——"</p>
+        <p class="dialogue">"不会有误差。"裴今的声音忽然平静得不像十九岁。"因为我会在那个瞬间推一把。让那个窗口……稍微大一点。"</p>
+        <p class="dialogue">"大多少？"</p>
+        <p class="dialogue">"够用。"</p>
+        <p>这不是精确的答案。但所有人看着裴今的眼睛——那双年轻的、明亮的、有金色光芒浮动的眼睛——他们看到了某种无法用数据解释的东西。</p>
+        <p class="dialogue">"按裴今的方案走。"焰说。</p>
+        <p>裴今深吸一口气。然后她笑了——纯粹的、没有杂质的笑。</p>
+        <p class="dialogue">"焰姐，我一直想说——我的能力不是运气。运气是随机的。我做的是……<span class="emphasis">选择</span>。在所有可能发生的事情里，选出那个应该发生的。"</p>
+        <p>她抬起双手。金色的光从全身涌出。空气中出现了无数条细如发丝的金色丝线——概率流的可视化呈现。裴今站在丝线的中心，像一个织工站在巨大的织机前。</p>
+        <p>她在编织。</p>
+        <p class="dialogue">"现在！"</p>
+        <p>沈暮的感知在同一瞬间灌入了那个微小的供电波动。</p>
+        <p>时间仿佛慢了。</p>
+        <p>一毫秒。沈暮的意识像一根针刺入了自毁回路的控制信号。裴今的力量在物理层面扩大了那个窗口——从微秒变成毫秒，从毫秒变成足够。</p>
+        <p>沈暮掌握了自毁回路。</p>
+        <p class="dialogue">"关闭！"</p>
+        <p>警报声停了。自毁倒计时在剩余两分三十四秒时归零。</p>
+        <p>裴今的双腿一软，坐倒在地。金光消散。脸色白如纸，鼻血沿嘴角流下来。</p>
+        <p class="dialogue">"呼……好累。"她冲焰比了个V，"成功了吧？"</p>
+        <p>焰蹲下来，用袖子替她擦掉鼻血。这个动作很轻、很自然——连她自己都没有意识到，这是她第一次对一个队友做出纯粹出于关心而非职责的举动。</p>
+        <p class="dialogue">"成功了。"</p>
+        <p>C+。这就是评级系统的荒谬之处。裴今做的事情在物理测量上几乎无法量化——她不能劈开山岳，不能焚烧海洋。但她能在整个宇宙说"不可能"的时候，轻轻回答——</p>
+        <p class="emphasis">"可以。"</p>
+      </div>
+
+      <!-- ==================== 第八章 ==================== -->
+      <div class="chapter" id="ch8">
+        <div class="chapter-title">第八章 · 燎原</div>
+        <div class="chapter-subtitle">裂隙母体 · 地下三千米</div>
+
+        <p>新历188年春。秦远召见灼野小队全体成员。</p>
+        <p class="dialogue">"S级异变体'裂隙母体'已被探测到。十二年前导致大裂变的元凶。它没有消亡——它在地壳深处休眠。现在，它在苏醒。"</p>
+        <p>全息投影显示了一个庞大到令人窒息的生物结构——盘踞在大陆板块断裂带中，体型跨越数十公里。不是一个生物。更像是一种活着的灾难。</p>
+        <p class="dialogue">"唯一的方案：一支小队携带能量湮灭装置深入地下三千米的核心区域。但装置的能量不够——需要一个S级异能者作为催化剂。"</p>
+        <p>他看向焰。</p>
+        <p class="dialogue">"共振引爆的能量负荷超过任何已知极限。如果你能在引爆瞬间突破到S级——理论上可以做到。"</p>
+        <p class="dialogue">"理论上。"陆屿冷冷地重复。</p>
+        <p class="dialogue">"是的。理论上。"</p>
+        <p class="dialogue">"我去。"焰说。</p>
+        <p class="dialogue">"我们都去。"沈暮推了推眼镜。"你以为你一个人能穿过三千米的异变体巢穴？"</p>
+        <p class="dialogue">"引爆点六百米内的一切都会被湮灭。你们不能在场。"</p>
+        <p class="dialogue">"队长。"姜雪开口了，声音平静但不容反驳。"你上次独自行动是什么时候？第七隔离带。你炸塌了半栋楼。"</p>
+        <p>焰语塞。</p>
+        <p class="dialogue">"我们把你送到引爆点。引爆前撤出六百米。"陆屿站起来。</p>
+        <p class="dialogue">"六百米，在地下三千米的异变体巢穴里？"</p>
+        <p class="dialogue">"这是我要解决的问题。"</p>
+        <p>苏棠举手：<span class="dialogue">"我负责撤退途中所有人的身体状态。"</span></p>
+        <p>裴今最后抬头。金色光点在瞳孔深处隐隐浮动。</p>
+        <p class="dialogue">"焰姐，我刚才在看未来。很多条。你一个人去的那些——大部分都失败了。但有一条最亮的线。"</p>
+        <p class="dialogue">"哪一条？"</p>
+        <p class="dialogue">"我们一起去的那一条。"</p>
+
+        <div class="scene-break">· · ·</div>
+
+        <p>地下三千米。裂隙母体的核心区域。</p>
+        <p>空气中弥漫低沉的嗡鸣，整颗星球在呻吟。通道壁面不再是岩石——有机质与矿物质融合的奇异物质在脉动，像活着一样。</p>
+        <p>灼野小队在这片地狱中推进了六个小时。</p>
+        <p>沈暮接管了裂隙母体的部分神经网络——不是入侵，是"翻译"。把母体的生物电信号转化为队伍可用的环境数据。陆屿一路重构通道壁面，为队伍开路。苏棠全程维持治疗，在每个人体力降到危险线之前进行修复。姜雪走在后方，全功率的相位偏移射击清除每一个跟踪者——精准，从容，不犹豫。裴今在每个分岔路口都能指出正确方向。</p>
+        <p>焰走在最前面。</p>
+        <p>核心区域——一个直径超过两百米的空腔。中央悬浮着一团脉动的光，那是裂隙母体的核心。</p>
+        <p class="dialogue">"布置湮灭装置。"</p>
+        <p>陆屿在指定位置固定了装置。</p>
+        <p class="dialogue">"共振引爆需要三分钟。之后你有三十秒撤离到六百米外。"</p>
+        <p>三十秒跑六百米，在这种地形下，不可能。</p>
+        <p>所有人都知道。</p>
+        <p class="dialogue">"焰姐。"裴今走上前，握住了焰的手。金色的光在她们之间流淌。</p>
+        <p class="dialogue">"我看到了一条线。你不需要跑。你可以吸收湮灭能量的反冲波。"</p>
+        <p>沈暮猛然抬头：<span class="dialogue">"那个能量级别——她的身体承受不了！"</span></p>
+        <p class="dialogue">"如果只靠她自己。"裴今看向苏棠。</p>
+        <p>苏棠一瞬间明白了：<span class="dialogue">"我可以在她吸收能量的同时进行生物修复。只要修复速度跟上损伤速度——"</span></p>
+        <p class="dialogue">"你必须贴着她。六百米范围内。"</p>
+        <p class="dialogue">"我也留下。"陆屿说。零犹豫。"导流织物在共振期间会承受极限负荷。我需要实时重构它的分子结构。"</p>
+        <p>姜雪走到空腔入口，举起枪：<span class="dialogue">"三分钟。我守这个门。"</span></p>
+        <p>沈暮摘下眼镜又戴上，蓝光亮起：<span class="dialogue">"我同步所有人的行动节奏。苏棠的治疗强度、陆屿的重构节点——都按我的指令来。裴今，你持续干涉概率场。"</span></p>
+        <p class="dialogue">"能做到吗？"焰问。不是问某一个人。是问所有人。</p>
+        <p class="dialogue">"能。"五个声音同时响起。</p>
+        <p>焰把双手放在了湮灭装置上。</p>
+        <p class="dialogue">"灼野小队——最后一次任务。开始。"</p>
+
+        <div class="scene-break">· · ·</div>
+
+        <p>共振引爆的三分钟。焰这辈子最漫长的三分钟。</p>
+        <p>能量从她体内涌出，通过装置与裂隙母体核心形成共振。每一秒，体内能量以指数级攀升。不像是释放力量——像是被力量吞噬。</p>
+        <p>陆屿的手掌按在她背上，一秒不停地重构导流织物——当一个节点烧穿时，他在零点几秒内重建它。他的手指被高温灼伤了，但他没有挪开。</p>
+        <p>苏棠贴在焰身侧，双手覆在焰胸口。绿色光与橙红色光交织。焰的身体组织在高能量负荷下撕裂，苏棠就不断修复——像两个人在同一块黑板上一个擦一个写。</p>
+        <p>苏棠能感受到焰的痛苦——每个细胞都在燃烧的感觉。这是她异能的代价：治疗时会感受患者的痛觉。</p>
+        <p>她没有松手。</p>
+        <p>沈暮的声音在通讯器里持续不断，像精密的节拍器——<span class="dialogue">"苏棠，右臂修复加强。陆屿，C-7节点即将失效。焰，输出再提升百分之五——你可以的——"</span></p>
+        <p>姜雪在入口处击退了三波异变体。子弹用完了，换备用弹匣。备用弹匣也空了。她扔掉枪，捡起一根断裂的钢管。异变体冲来——她用相位偏移穿过第一只，反手刺中第二只要害，将第三只推出通道。</p>
+        <p>裴今站在所有人中心。金色概率丝线覆盖了整个核心区域。鼻血不停，耳朵也在流血。但她的表情前所未有地专注。无数个可能的未来在不断分裂、消亡、重组。大多数通向毁灭。但有一条线——细如发丝，微弱如烛火——始终存在。</p>
+        <p>她用尽全力抓住那条线。不让它断。</p>
+
+        <div class="scene-break">· · ·</div>
+
+        <p>最后三十秒。</p>
+        <p>焰的能量输出达到了临界点。超越可见光谱的白色光芒从她身体里喷涌而出。</p>
+        <p>在那一瞬间，她感觉到了。</p>
+        <p>不是力量。不是痛苦。不是恐惧。</p>
+        <p>是身后每一个人的存在。</p>
+        <p>陆屿按在她背上的手。苏棠贴在她胸口的掌心。沈暮在耳边的声音。远处姜雪沉默的守护。裴今笼罩着所有人的金色光芒。</p>
+        <p>她从来不是一个人。从她接受灼野小队那天起，她就不再是一个人了。</p>
+        <p class="emphasis">S级觉醒的条件不是更强的功率。是在你最强大的时刻，知道自己的力量是为了谁而燃烧。</p>
+        <p>焰的瞳孔从琥珀色变成了纯粹的金色。</p>
+        <p>能量等级突破了A++的极限。</p>
+        <p>S级。</p>
+        <p>湮灭装置全功率引爆。白光吞没了裂隙母体的核心。</p>
+        <p>然后是反冲波——一道足以抹除一切的毁灭性能量海啸。</p>
+        <p>焰张开双臂。</p>
+        <p>她<span class="emphasis">吸收</span>了它。</p>
+        <p>身体承受的能量超过了人类极限。细胞在崩溃——苏棠在重建。装备在燃烧——陆屿在重构。意识在模糊——沈暮的声音把她拉回来。不可能发生的事正在发生——裴今让它成为了可能。</p>
+        <p>三秒。全部在三秒内完成。</p>
+        <p>光芒散去。核心区域只剩空旷的黑暗。裂隙母体的光芒消失了。脉动停止了。嗡鸣沉寂了。</p>
+        <p>焰跪在地上，双手撑着地面，大口喘气。全身冒烟。但她活着。</p>
+        <p>苏棠瘫倒在她身边，脸色灰白，嘴角带着笑。</p>
+        <p>陆屿仰面躺在地上，举起双手看着烧焦的手指，轻声骂了一句。</p>
+        <p>沈暮靠在壁面上，数据眼镜的镜片裂了一条缝。</p>
+        <p>姜雪从入口走过来，嘴角有血，手里还握着钢管。</p>
+        <p>裴今坐在原地，看着手上残余的金色光点慢慢消散。</p>
+        <p class="dialogue">"诶，"裴今说，声音虚弱但快活，"我们赢了吧？"</p>
+        <p>焰撑着地面慢慢坐起来。她环顾四周——每个人都伤痕累累，疲惫不堪。没有一个人完好无损。</p>
+        <p>但没有一个人倒下。</p>
+        <p class="dialogue">"赢了。"焰说。</p>
+        <p>她笑了。真的笑了。笑容让她看起来年轻了很多，像一个终于卸下所有重负的人。</p>
+        <p class="dialogue">"我们赢了。"</p>
+      </div>
+
+      <!-- ==================== 尾声 ==================== -->
+      <div class="chapter" id="ch9">
+        <div class="chapter-title">尾声 · 新火</div>
+        <div class="chapter-subtitle">裂隙母体消亡后 · 重建纪元</div>
+
+        <p>秦远在任务报告上签字的时候，手停了一秒。</p>
+        <p>报告最后一栏——"队长焰，异能评级：S级"。</p>
+        <p>他放下笔，走到窗前。窗外是重建中的世界。裂隙母体的消亡让全球异变体活动骤降了百分之七十。人类第一次看到了彻底夺回地表的可能性。</p>
+        <p>而完成这一切的，是六个人。</p>
+        <p>不——不是六个独立的个体。是一个团队。</p>
+
+        <div class="scene-break">· · ·</div>
+
+        <p>一个月后的一个傍晚。</p>
+        <p>灼野小队的休息室里难得地热闹。陆屿在角落里改装一台不知道从哪搞来的老式收音机，把它变成了一个能接收三十七个频段的多功能通讯器——纯粹是因为他觉得好玩。沈暮窝在沙发上，数据眼镜的光标缓慢跳动，她在看什么只有她能看到的东西——也许是数据，也许是新闻，也许只是发呆。苏棠在泡茶，她从医疗部的同事那里搞到了一种很稀有的高山绿茶——裂变之后能找到好茶叶是一件很奢侈的事。</p>
+        <p>姜雪坐在窗边擦枪。不是因为枪需要擦——陆屿改造过的枪有自清洁功能——而是因为这个动作让她安心。但和以前不同的是，她坐的位置不再是最远的角落。她在窗边，裴今就坐在她旁边的地上，靠着她的腿看一本什么漫画。</p>
+        <p>焰站在门口，端着苏棠递给她的茶杯。</p>
+        <p>茶的热度透过杯壁传到她的手心——她的体温永远比常人高三度，这意味着她对温度的感知比别人迟钝。但今天，她觉得这杯茶刚好。</p>
+        <p>她看着这个房间里的每一个人。</p>
+        <p>沈暮是眼睛，看见所有人看不见的。</p>
+        <p>苏棠是心脏，在最痛的时候也不停跳。</p>
+        <p>陆屿是骨骼，承载一切重量。</p>
+        <p>姜雪是脊梁，在所有人身后挺直。</p>
+        <p>裴今是那条线——连接不可能与可能之间的桥。</p>
+        <p>而焰是火。</p>
+        <p>一团独自燃烧的火，可以照亮一间房。</p>
+        <p>但一群人守护的火，可以照亮整片荒原。</p>
+        <p>她喝了一口茶。</p>
+        <p>窗外的模拟天空——不，这里没有模拟天空。这是地面上的休息室。窗外是真正的天空。裂变之后第一次，夕阳把云层染成了金红色。</p>
+        <p class="dialogue">"好看。"裴今趴在窗台上说。</p>
+        <p>没有人回答。但所有人都在看。</p>
+        <p>焰低头看着杯中的茶水。茶叶在热水中慢慢舒展，像一团小小的绿色火焰。</p>
+        <p>她想——也许余烬从来不是终点。</p>
+        <p>余烬是新火的起点。</p>
+
+        <div class="scene-break" style="margin-top:60px;letter-spacing:12px;font-size:16px;color:var(--accent)">灼 野 · 燎 原</div>
+        <p style="text-align:center;color:var(--text-muted);font-family:'Noto Sans SC',sans-serif;font-size:13px;margin-top:24px;">（全文完）</p>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- CHARACTER DETAIL MODAL -->
+<div class="char-modal-overlay" id="charModal" onclick="if(event.target===this)closeCharModal()">
+  <div class="char-modal" id="charModalContent"></div>
+</div>
+
+<script>
+const chapters = [
+  { id: 'cover', label: '封面' },
+  { id: 'ch0', label: '序章 · 独火' },
+  { id: 'ch1', label: '第一章 · 灰烬中的种子' },
+  { id: 'ch2', label: '第二章 · 碎片拼图' },
+  { id: 'ch3', label: '第三章 · 暮色中的网' },
+  { id: 'ch4', label: '第四章 · 不碎的人' },
+  { id: 'ch5', label: '第五章 · 铸者之手' },
+  { id: 'ch6', label: '第六章 · 看不见的弹道' },
+  { id: 'ch7', label: '第七章 · 微光织网' },
+  { id: 'ch8', label: '第八章 · 燎原' },
+  { id: 'ch9', label: '尾声 · 新火' },
+];
+
+const characterData = {
+  yan: {
+    name: '焰', title: '灼野小队 · 队长',
+    color: '#ff4d35', bgGrad: 'linear-gradient(135deg, #1a0500 0%, #4a1000 40%, #ff4d35 100%)',
+    rating: 'S', abilityName: '能量操控', abilityType: '能量系',
+    appearance: '红色短发，身高175cm以上，琥珀色眼瞳（使用异能时转为金色），手臂上有多条旧伤疤',
+    personality: '沉默寡言，习惯独自行动。表面冷淡，实则极度害怕伤害他人。对队友的关心往往藏在简短的命令和不经意的动作之中。',
+    ability: '吸收、储存、释放一切形式的能量——热能、动能、电磁能、辐射。输出功率极高但曾长期缺乏精确控制。在灼野小队的成长过程中，逐步理解了"稳定"的含义，最终突破为S级。',
+    growth: '从"独自燃烧"到"为他人燃烧"。她的S级觉醒不是功率突破，而是领悟了力量的意义在于守护。'
+  },
+  shenmu: {
+    name: '沈暮', title: '灼野小队 · 信息战专家',
+    color: '#4da6ff', bgGrad: 'linear-gradient(135deg, #000a1a 0%, #001a4a 40%, #4da6ff 100%)',
+    rating: 'B+', abilityName: '感知网络', abilityType: '感知系',
+    appearance: '身材娇小，苍白肤色，戴高端数据眼镜，右腿装有轻型外骨骼辅助器',
+    personality: '极度理性冷静，说话精准如同技术报告。看似冷漠，实则是最深刻理解每个队友的人。身体虚弱但意志如钢。',
+    ability: '将意识延伸进电子设备和数据网络，进行信息收集、系统入侵和实时战场态势分析。需要物理接触才能接入损坏设备。长期使用导致神经系统损伤。',
+    growth: '从幕后分析师到前线核心。她证明了"信息就是最强的武器"——在没有一拳一脚的情况下，她的战场判断多次挽救全队。'
+  },
+  sutang: {
+    name: '苏棠', title: '灼野小队 · 战地医疗',
+    color: '#4dff88', bgGrad: 'linear-gradient(135deg, #001a0a 0%, #004a1a 40%, #4dff88 100%)',
+    rating: 'B', abilityName: '生物修复', abilityType: '生物系',
+    appearance: '圆脸，酒窝，眼睛明亮。袖口别一朵不合规的小雏菊干花',
+    personality: '温柔善良，笑容常驻。看起来最弱的一个，却拥有全队最坚不可摧的意志——"我不会让任何人在我面前死掉"。',
+    ability: '修复伤口、再生组织，治疗时会感受患者的痛觉。极端状态下可将修复能力翻转为"生物屏障"——以消耗自身细胞储备为代价构建防御。',
+    growth: '从零实战经验的医疗兵到在炮火中纹丝不动的守护者。她从不后退，不是因为不怕——而是因为她更怕队友受伤。'
+  },
+  luyu: {
+    name: '陆屿', title: '灼野小队 · 战场工程师',
+    color: '#b0b8c4', bgGrad: 'linear-gradient(135deg, #0a0a0f 0%, #1a1a2a 40%, #b0b8c4 100%)',
+    rating: 'B+', abilityName: '物质重构', abilityType: '物质系',
+    appearance: '宽肩膀，胡茬，手指粗糙嵌着金属粉末，穿皱巴巴的工装裤',
+    personality: '嘴硬心软，不善言辞。曾因"违纪"被处分——实际上是因为不能忍受看到问题却不修正。用七天不眠不休为每个队友量身打造装备。',
+    ability: '在分子层面重新排列物质结构——废铁变精密仪器，沙子变防弹玻璃。精度可达微米级。',
+    growth: '他的异能改变物质，但他真正改变的是可能性——把冰冷的材料变成保护人的东西。'
+  },
+  jiangxue: {
+    name: '姜雪', title: '灼野小队 · 远程打击',
+    color: '#c8d8ff', bgGrad: 'linear-gradient(135deg, #050510 0%, #0a0a30 40%, #c8d8ff 100%)',
+    rating: 'A-', abilityName: '相位偏移', abilityType: '空间系',
+    appearance: '银灰色低马尾，面容冷硬，眼窝深邃',
+    personality: '沉默寡言，与人保持距离。因一年前的任务失误导致搭档阵亡而自我封锁。在灼野小队中慢慢卸下心防。',
+    ability: '让自己或物体的物理存在状态发生短暂偏移——穿透固体、扭曲弹道。全功率下可实现匪夷所思的远程精确打击。',
+    growth: '从自我封锁到重新开枪。她解开的不是技术瓶颈，而是心结——林峥不会希望她用自我惩罚来纪念自己。'
+  },
+  peijin: {
+    name: '裴今', title: '灼野小队 · 概率干涉者',
+    color: '#ffd700', bgGrad: 'linear-gradient(135deg, #0f0a00 0%, #2a1a00 40%, #ffd700 100%)',
+    rating: 'C+→?', abilityName: '概率干涉', abilityType: '概率系',
+    appearance: '十九岁，两根短辫子，脸上有青春痘印，全新的作战服标签没摘干净',
+    personality: '开朗乐天，像误入军事基地的大学生。看似最弱实则最关键——她的能力是在"不可能"中找到"可以"的那条线。',
+    ability: '在无数个可能的未来中感知概率流向，并施加微小的干涉——让最好的结果稍微更可能发生。不是运气，是选择。',
+    growth: '从C+评级到让所有人重新定义"强"的含义。她证明了力量不只有功率一种形式——在宇宙说"不可能"的时候轻轻回答"可以"。'
+  }
+};
+
+function createAvatarSVG(charId, size = 52) {
+  const d = characterData[charId];
+  const c = d.color;
+  const svgs = {
+    yan: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <defs><radialGradient id="yg" cx="50%" cy="40%"><stop offset="0%" stop-color="#ffb08a"/><stop offset="100%" stop-color="#d4845a"/></radialGradient></defs>
+      <circle cx="50" cy="50" r="50" fill="#1a0500"/>
+      <circle cx="50" cy="50" r="48" fill="#2a0800" stroke="${c}" stroke-width="1" opacity="0.5"/>
+      <circle cx="50" cy="44" r="22" fill="url(#yg)"/>
+      <ellipse cx="50" cy="78" rx="24" ry="16" fill="#1a1a26"/>
+      <path d="M28 30 Q32 18 50 16 Q68 18 72 30 Q70 24 60 22 L58 32 Q50 28 42 32 L40 22 Q30 24 28 30Z" fill="${c}"/>
+      <circle cx="42" cy="42" r="3" fill="#2a0800"/><circle cx="58" cy="42" r="3" fill="#2a0800"/>
+      <circle cx="42" cy="41.5" r="1.5" fill="#ffd700" opacity="0.9"/>
+      <circle cx="58" cy="41.5" r="1.5" fill="#ffd700" opacity="0.9"/>
+      <path d="M45 50 Q50 53 55 50" stroke="#c07060" stroke-width="1.2" fill="none"/>
+      <line x1="28" y1="28" x2="22" y2="20" stroke="${c}" stroke-width="2" opacity="0.6"/>
+      <line x1="72" y1="28" x2="78" y2="20" stroke="${c}" stroke-width="2" opacity="0.6"/>
+    </svg>`,
+    shenmu: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <defs><radialGradient id="sg" cx="50%" cy="40%"><stop offset="0%" stop-color="#e8ddd0"/><stop offset="100%" stop-color="#c4b0a0"/></radialGradient></defs>
+      <circle cx="50" cy="50" r="50" fill="#000a1a"/>
+      <circle cx="50" cy="50" r="48" fill="#001030" stroke="${c}" stroke-width="1" opacity="0.5"/>
+      <circle cx="50" cy="44" r="20" fill="url(#sg)"/>
+      <ellipse cx="50" cy="78" rx="22" ry="15" fill="#1a1a26"/>
+      <path d="M30 36 Q34 24 50 22 Q66 24 70 36 L68 34 Q64 28 50 26 Q36 28 32 34Z" fill="#1a1a2a"/>
+      <rect x="34" y="38" width="32" height="10" rx="5" fill="${c}" opacity="0.3" stroke="${c}" stroke-width="0.8"/>
+      <circle cx="42" cy="42" r="2.5" fill="${c}" opacity="0.9"/>
+      <circle cx="58" cy="42" r="2.5" fill="${c}" opacity="0.9"/>
+      <path d="M45 50 Q50 52 55 50" stroke="#a09080" stroke-width="1" fill="none"/>
+      <rect x="60" y="68" width="12" height="3" rx="1.5" fill="#445" opacity="0.6"/>
+    </svg>`,
+    sutang: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <defs><radialGradient id="stg" cx="50%" cy="40%"><stop offset="0%" stop-color="#ffe0d0"/><stop offset="100%" stop-color="#ddc0a8"/></radialGradient></defs>
+      <circle cx="50" cy="50" r="50" fill="#001a0a"/>
+      <circle cx="50" cy="50" r="48" fill="#002a10" stroke="${c}" stroke-width="1" opacity="0.5"/>
+      <circle cx="50" cy="44" r="21" fill="url(#stg)"/>
+      <ellipse cx="50" cy="78" rx="23" ry="15" fill="#1a1a26"/>
+      <path d="M28 38 Q30 20 50 18 Q70 20 72 38 Q70 34 65 30 Q60 36 50 38 Q40 36 35 30 Q30 34 28 38Z" fill="#2a1a0a"/>
+      <circle cx="42" cy="42" r="2.5" fill="#2a1a0a"/>
+      <circle cx="58" cy="42" r="2.5" fill="#2a1a0a"/>
+      <path d="M42 50 Q46 55 50 54 Q54 55 58 50" stroke="#c09080" stroke-width="1.2" fill="none"/>
+      <circle cx="38" cy="48" r="3" fill="${c}" opacity="0.15"/>
+      <circle cx="62" cy="48" r="3" fill="${c}" opacity="0.15"/>
+      <circle cx="14" cy="62" r="2.5" fill="#fff" opacity="0.15"/>
+      <circle cx="12" cy="58" r="1.5" fill="#fff" opacity="0.1"/>
+    </svg>`,
+    luyu: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <defs><radialGradient id="lg" cx="50%" cy="40%"><stop offset="0%" stop-color="#d8c8b8"/><stop offset="100%" stop-color="#b0a090"/></radialGradient></defs>
+      <circle cx="50" cy="50" r="50" fill="#0a0a0f"/>
+      <circle cx="50" cy="50" r="48" fill="#15151f" stroke="${c}" stroke-width="1" opacity="0.5"/>
+      <circle cx="50" cy="42" r="22" fill="url(#lg)"/>
+      <ellipse cx="50" cy="78" rx="26" ry="17" fill="#1a1a26"/>
+      <path d="M30 34 Q34 24 50 22 Q66 24 70 34 L68 32 Q62 26 50 25 Q38 26 32 32Z" fill="#3a3a40"/>
+      <rect x="40" y="52" width="20" height="3" rx="1" fill="#8a8a90" opacity="0.3"/>
+      <circle cx="42" cy="40" r="2.5" fill="#3a3a40"/>
+      <circle cx="58" cy="40" r="2.5" fill="#3a3a40"/>
+      <path d="M44 48 Q50 50 56 48" stroke="#908070" stroke-width="1.2" fill="none"/>
+      <rect x="20" y="72" width="8" height="3" rx="1" fill="${c}" opacity="0.3"/>
+    </svg>`,
+    jiangxue: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <defs><radialGradient id="jg" cx="50%" cy="40%"><stop offset="0%" stop-color="#f0e8e0"/><stop offset="100%" stop-color="#d0c0b8"/></radialGradient></defs>
+      <circle cx="50" cy="50" r="50" fill="#050510"/>
+      <circle cx="50" cy="50" r="48" fill="#0a0a20" stroke="${c}" stroke-width="1" opacity="0.5"/>
+      <circle cx="50" cy="44" r="20" fill="url(#jg)"/>
+      <ellipse cx="50" cy="78" rx="22" ry="15" fill="#1a1a26"/>
+      <path d="M32 38 Q36 22 50 20 Q64 22 68 38 L64 32 Q60 26 50 24 Q40 26 36 32Z" fill="${c}" opacity="0.5"/>
+      <path d="M64 32 Q68 36 70 50 L72 48" stroke="${c}" stroke-width="1.5" fill="none" opacity="0.4"/>
+      <circle cx="42" cy="42" r="2" fill="#2a2a40"/>
+      <circle cx="58" cy="42" r="2" fill="#2a2a40"/>
+      <path d="M46 50 Q50 51 54 50" stroke="#b0a098" stroke-width="1" fill="none"/>
+    </svg>`,
+    peijin: `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <defs><radialGradient id="pg" cx="50%" cy="40%"><stop offset="0%" stop-color="#ffe8d0"/><stop offset="100%" stop-color="#e0c0a0"/></radialGradient></defs>
+      <circle cx="50" cy="50" r="50" fill="#0f0a00"/>
+      <circle cx="50" cy="50" r="48" fill="#1a1200" stroke="${c}" stroke-width="1" opacity="0.5"/>
+      <circle cx="50" cy="44" r="20" fill="url(#pg)"/>
+      <ellipse cx="50" cy="78" rx="22" ry="15" fill="#1a1a26"/>
+      <path d="M30 34 Q34 22 50 20 Q66 22 70 34 L66 30 Q60 24 50 22 Q40 24 34 30Z" fill="#2a1a0a"/>
+      <line x1="34" y1="28" x2="28" y2="20" stroke="#2a1a0a" stroke-width="2.5" stroke-linecap="round"/>
+      <line x1="66" y1="28" x2="72" y2="20" stroke="#2a1a0a" stroke-width="2.5" stroke-linecap="round"/>
+      <circle cx="42" cy="42" r="3" fill="#2a1a0a"/>
+      <circle cx="58" cy="42" r="3" fill="#2a1a0a"/>
+      <circle cx="42.5" cy="41.5" r="1.2" fill="${c}" opacity="0.7"/>
+      <circle cx="58.5" cy="41.5" r="1.2" fill="${c}" opacity="0.7"/>
+      <path d="M43 49 Q50 55 57 49" stroke="#c09070" stroke-width="1.2" fill="none"/>
+      <circle cx="24" cy="30" r="1.5" fill="${c}" opacity="0.3"/>
+      <circle cx="76" cy="30" r="1.5" fill="${c}" opacity="0.3"/>
+      <circle cx="20" cy="40" r="1" fill="${c}" opacity="0.2"/>
+      <circle cx="80" cy="40" r="1" fill="${c}" opacity="0.2"/>
+    </svg>`
+  };
+  return svgs[charId] || '';
+}
+
+// Populate avatars
+function populateAvatars() {
+  const ids = ['yan','shenmu','sutang','luyu','jiangxue','peijin'];
+  ids.forEach(id => {
+    const sidebarEl = document.getElementById(`avatar-${id}-sidebar`);
+    if (sidebarEl) sidebarEl.innerHTML = createAvatarSVG(id);
+  });
+  const coverEl = document.getElementById('coverCharacters');
+  if (coverEl) {
+    coverEl.innerHTML = ids.map(id =>
+      `<div class="cover-char-icon" onclick="openCharModal('${id}')">${createAvatarSVG(id, 56)}</div>`
+    ).join('');
+  }
+}
+
+// Build chapter list
+function buildChapterList() {
+  const list = document.getElementById('chapterList');
+  list.innerHTML = chapters.map((ch, i) => 
+    `<div class="chapter-item${i===0?' active':''}" data-target="${ch.id}" onclick="scrollToChapter('${ch.id}', this)">
+      <span class="ch-num">${i === 0 ? '◈' : (i < 10 ? '0' + i : i)}</span>
+      <span>${ch.label}</span>
+    </div>`
+  ).join('');
+}
+
+function scrollToChapter(id, el) {
+  const target = document.getElementById(id);
+  if (!target) return;
+  target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  document.querySelectorAll('.chapter-item').forEach(i => i.classList.remove('active'));
+  if (el) el.classList.add('active');
+  if (window.innerWidth <= 768) document.getElementById('sidebar').classList.remove('open');
+}
+
+// Tabs
+function switchTab(tab) {
+  document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+  if (tab === 'chapters') {
+    document.querySelector('.sidebar-tab:first-child').classList.add('active');
+    document.getElementById('chapterList').style.display = 'block';
+    document.getElementById('characterList').style.display = 'none';
+  } else {
+    document.querySelector('.sidebar-tab:last-child').classList.add('active');
+    document.getElementById('chapterList').style.display = 'none';
+    document.getElementById('characterList').style.display = 'block';
+  }
+}
+
+// Progress bar
+const mainContent = document.getElementById('mainContent');
+mainContent.addEventListener('scroll', () => {
+  const st = mainContent.scrollTop;
+  const sh = mainContent.scrollHeight - mainContent.clientHeight;
+  const pct = sh > 0 ? (st / sh) * 100 : 0;
+  document.getElementById('progressFill').style.width = pct + '%';
+
+  // Update active chapter
+  const chapterEls = chapters.map(ch => document.getElementById(ch.id));
+  let active = 0;
+  for (let i = chapterEls.length - 1; i >= 0; i--) {
+    if (chapterEls[i] && chapterEls[i].offsetTop - 100 <= st) { active = i; break; }
+  }
+  document.querySelectorAll('.chapter-item').forEach((el, i) => {
+    el.classList.toggle('active', i === active);
+  });
+});
+
+// Character modal
+function openCharModal(charId) {
+  const d = characterData[charId];
+  if (!d) return;
+  const modal = document.getElementById('charModalContent');
+  modal.innerHTML = `
+    <div class="char-modal-header" style="background:${d.bgGrad}">
+      <div class="modal-avatar">${createAvatarSVG(charId, 88)}</div>
+      <div class="modal-name-block">
+        <div class="modal-name">${d.name}</div>
+        <div class="modal-title">${d.title}</div>
+      </div>
+      <button class="char-modal-close" onclick="closeCharModal()">✕</button>
+    </div>
+    <div class="char-modal-body">
+      <div class="char-stat-grid">
+        <div class="char-stat">
+          <div class="stat-label">评级</div>
+          <div class="stat-value" style="color:${d.color}">${d.rating}</div>
+        </div>
+        <div class="char-stat">
+          <div class="stat-label">异能</div>
+          <div class="stat-value" style="color:${d.color}">${d.abilityName}</div>
+        </div>
+        <div class="char-stat">
+          <div class="stat-label">系别</div>
+          <div class="stat-value" style="color:${d.color}">${d.abilityType}</div>
+        </div>
+      </div>
+      <div class="char-bio-section">
+        <h4>外貌</h4>
+        <p>${d.appearance}</p>
+      </div>
+      <div class="char-bio-section">
+        <h4>性格</h4>
+        <p>${d.personality}</p>
+      </div>
+      <div class="char-bio-section">
+        <h4>异能详述</h4>
+        <p>${d.ability}</p>
+      </div>
+      <div class="char-bio-section">
+        <h4>成长弧线</h4>
+        <p>${d.growth}</p>
+      </div>
+    </div>
+  `;
+  document.getElementById('charModal').classList.add('active');
+}
+
+function closeCharModal() {
+  document.getElementById('charModal').classList.remove('active');
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape') closeCharModal();
+});
+
+// Init
+populateAvatars();
+buildChapterList();
+</script>
+</body>
+</html>
