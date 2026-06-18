@@ -408,21 +408,20 @@ body {
   justify-content: center;
 }
 
-.card-portrait::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse at 50% 80%, rgba(0,0,0,0) 30%, rgba(12,12,20,0.8) 100%);
-  z-index: 1;
-  pointer-events: none;
-}
-
 .card-portrait img {
   height: 100%;
   object-fit: contain;
   position: relative;
-  filter: drop-shadow(0 4px 24px rgba(0,0,0,0.4));
+  z-index: 1;
   transition: opacity 0.35s ease;
+  -webkit-mask-image:
+    linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%),
+    linear-gradient(to bottom, black 0%, black 85%, transparent 100%);
+  -webkit-mask-composite: destination-in;
+  mask-image:
+    linear-gradient(to right, transparent 0%, black 12%, black 88%, transparent 100%),
+    linear-gradient(to bottom, black 0%, black 85%, transparent 100%);
+  mask-composite: intersect;
 }
 
 .outfit-toggle {
@@ -1711,7 +1710,7 @@ function openCharModal(charId) {
     <div class="card-corner bl"></div><div class="card-corner br"></div>
     <button class="char-modal-close" onclick="closeCharModal()">✕</button>
     <div class="card-layout">
-      <div class="card-portrait">
+      <div class="card-portrait" style="background:radial-gradient(ellipse at 50% 60%, ${d.color}18 0%, ${d.color}08 40%, #0c0c14 100%)">
         <img id="portraitImg" src="${charImages[charId].casual}" alt="${d.name}">
         <div class="outfit-toggle">
           <button class="outfit-btn active" data-mode="casual" onclick="switchOutfit('${charId}','casual')">常服</button>
